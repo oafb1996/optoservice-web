@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import html
 import json
+import math
 import re
 import shutil
 import sys
@@ -98,9 +99,13 @@ class Optimizer:
         return self.cache[rel]
 
     def _process(self, rel):
-        src = ROOT / rel
-        if not rel or not src.is_file():
-            warn(f'no se encontró la imagen "{rel}"')
+        try:  # solo imágenes dentro de assets/ (sin ../ ni rutas fuera del sitio)
+            src = (ROOT / rel).resolve()
+            found = bool(rel) and src.is_file() and (ROOT / 'assets') in src.parents
+        except (OSError, ValueError):  # nombre demasiado largo o con caracteres no válidos
+            found = False
+        if not found:
+            warn(f'no se encontró la imagen "{rel[:120]}"')
             return None
         try:
             im = ImageOps.exif_transpose(Image.open(src))
@@ -109,6 +114,8 @@ class Optimizer:
             warn(f'no se pudo abrir la imagen "{rel}": {e}')
             return None
 
+        if im.mode in ('I', 'I;16', 'I;16L', 'I;16B'):  # 16 bits por canal: pasar a 8 bits sin recortar
+            im = im.point(lambda v: v * (1 / 256)).convert('L')
         alpha = im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info)
         im = im.convert('RGBA' if alpha else 'RGB')
         w, h = im.size
@@ -252,7 +259,9 @@ def main():
     page = (ROOT / 'index.html').read_text(encoding='utf-8')
 
     fotos = load_json('fotos.json')
-    segundos = fotos.get('segundos') if isinstance(fotos.get('segundos'), (int, float)) else 5
+    segundos = fotos.get('segundos')
+    if isinstance(segundos, bool) or not isinstance(segundos, (int, float)) or not math.isfinite(segundos):
+        segundos = 5
     interval = int(min(max(segundos, 3), 20) * 1000)
     page = re.sub(r'data-interval="\d+"', f'data-interval="{interval}"', page)
     for slot in SLOTS:
