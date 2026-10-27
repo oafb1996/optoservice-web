@@ -1,0 +1,202 @@
+/* Opto Service — estilos del sitio */
+/* Parkinsans (Google Fonts, SIL OFL 1.1) — autoalojada */
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Parkinsans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../fonts/parkinsans-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Valores responsivos (escritorio por defecto, móvil < 880px) */
+:root {
+  --desktop-nav-display: flex;
+  --fab-display: flex;
+  --mobile-bar-display: none;
+  --mobile-bar-spacer: 0px;
+  --hero-cols: 1.15fr .85fr;
+  --exam-cols: 1.2fr .8fr;
+  --nos-cols: .85fr 1.15fr;
+  --suc-cols: 1fr 1fr;
+  --empresas-cols: 1fr 1fr;
+  --empresas-gap: 56px;
+  --afil-field-cols: 1fr 1fr;
+  --sec-pad: 96px 0;
+  --hero-pad: 128px 22px 92px;
+  --hero-gap: 50px;
+  --hero-card-left: -22px;
+  --nos-badge-right: -18px;
+  --senales-cols: repeat(3,1fr);
+  --contact-cols: 1.3fr .7fr;
+  --foot-cols: 1.5fr 1fr 1.4fr;
+  --foot-brand-span: auto;
+  --foot-pad: 64px 0 34px;
+  --foot-gap: 40px;
+  --foot-bottom-mt: 48px;
+}
+@media (max-width: 879.98px) {
+  :root {
+    --desktop-nav-display: none;
+    --fab-display: none;
+    --mobile-bar-display: flex;
+    --mobile-bar-spacer: 74px;
+    --hero-cols: 1fr;
+    --exam-cols: 1fr;
+    --nos-cols: 1fr;
+    --suc-cols: 1fr;
+    --empresas-cols: 1fr;
+    --empresas-gap: 34px;
+    --afil-field-cols: 1fr;
+    --sec-pad: 58px 0;
+    --hero-pad: 102px 18px 58px;
+    --hero-gap: 34px;
+    --hero-card-left: 14px;
+    --nos-badge-right: 12px;
+    --senales-cols: 1fr;
+    --contact-cols: 1fr;
+    --foot-cols: 1fr 1fr;
+    --foot-brand-span: 1 / -1;
+    --foot-pad: 46px 0 26px;
+    --foot-gap: 26px 18px;
+    --foot-bottom-mt: 24px;
+  }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Parkinsans',system-ui,sans-serif;background:#f3f3f3;color:#1b2540;-webkit-font-smoothing:antialiased}
+    a{text-decoration:none;color:inherit}
+    @keyframes floatPulse{0%,100%{box-shadow:0 10px 26px rgba(37,211,102,.45)}50%{box-shadow:0 10px 38px rgba(37,211,102,.75)}}
+    @keyframes spinSlow{to{transform:rotate(360deg)}}
+    /* 4 · animated brand underline on nav links (needs :hover::after — cannot be inline) */
+    [data-navlink]{position:relative}
+    [data-navlink]::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:2px;background:#06cacb;border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+    [data-navlink]:hover{color:#fff}
+    [data-navlink]:hover::after{transform:scaleX(1)}
+    /* 5 · service row arrow slide + number glow (needs parent:hover child — cannot be inline) */
+    [data-srow]:hover [data-arrow]{transform:translateX(9px);color:#06cacb}
+    [data-srow]:hover [data-snum]{color:#14213d}
+    /* 6 · button shine sweep (needs ::before + :hover — cannot be inline) */
+    [data-shine]::before{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-22deg);transition:left .65s cubic-bezier(.22,.61,.36,1);pointer-events:none}
+    [data-shine]:hover::before{left:160%}
+    [data-shine]{transition:transform .15s ease}
+    [data-shine]:active{transform:scale(.97)}
+    @media (prefers-reduced-motion: reduce){
+      [data-navlink]::after,[data-shine]::before,[data-srow] [data-arrow]{transition:none}
+    }
+    /* MOBILE 1 · tap/press feedback (touch has no hover) */
+    [data-tap]{transition:transform .15s ease, box-shadow .2s ease, background .2s ease}
+    [data-tap]:active{transform:scale(.97)}
+    @media (hover:none){
+      [data-srow] [data-arrow]{color:#06cacb;transform:translateX(3px)}
+      [data-srow]:active{background:#fff;box-shadow:0 12px 30px rgba(20,33,61,.12)}
+    }
+    /* MOBILE 3 · services become tappable cards on narrow screens */
+    @media (max-width:880px){
+      [data-services]{border-top:none !important;display:flex !important;flex-direction:column;gap:11px}
+      [data-srow]{background:#fff;border-radius:16px;border-bottom:none !important;padding:18px 16px !important;box-shadow:0 5px 16px rgba(20,33,61,.06);gap:14px !important;align-items:center}
+      [data-srow] [data-snum]{width:40px;height:40px;border-radius:11px;background:#e3f7f7;display:flex;align-items:center;justify-content:center;font-size:1.1rem !important;color:#04898a !important}
+      [data-srow]:active{transform:scale(.985)}
+      /* MOBILE 4 · full-width hero buttons */
+      [data-hero-grid] [data-reveal] a[data-shine],[data-hero-cta]{flex:1 1 100%;text-align:center}
+      /* MOBILE 6 · larger, more legible schedule rows */
+      [data-sched]{font-size:1rem !important}
+    }
+    /* MOBILE 2 · sticky bottom action bar sits above content */
+    [data-mobilebar]{transition:transform .15s ease}
+    [data-mobilebar] a:active{transform:scale(.96)}
+
+/* Navegación fija: transparente arriba, vidrio al hacer scroll */
+.site-nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .3s ease,box-shadow .3s ease,border-color .3s ease;background:rgba(20,33,61,0);border-bottom:1px solid rgba(255,255,255,0)}
+.site-nav.is-scrolled{background:rgba(18,30,56,.72);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border-bottom-color:rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.26)}
+.nav-burger{display:none;flex-direction:column;background:none;border:none;cursor:pointer;padding:6px;margin-left:auto}
+@media (max-width: 879.98px){ .nav-burger{display:flex} }
+.site-nav.menu-open [data-bar="1"]{transform:translateY(7.5px) rotate(45deg)}
+.site-nav.menu-open [data-bar="2"]{opacity:0}
+.site-nav.menu-open [data-bar="3"]{transform:translateY(-7.5px) rotate(-45deg)}
+.nav-drawer{overflow:hidden;transition:max-height .4s cubic-bezier(.22,.61,.36,1);max-height:0;background:linear-gradient(180deg,#1a2945,#16233c);display:flex;flex-direction:column;gap:2px;padding:0 22px}
+.site-nav.menu-open .nav-drawer{max-height:460px;padding:12px 22px 24px}
+
+/* Efectos hover / focus */
+@media (hover: hover) {
+  .is-hover-1:hover{background:#fff !important;padding-left:22px !important;padding-right:22px !important;box-shadow:0 14px 34px rgba(20,33,61,.08) !important}
+  .is-hover-2:hover{background:#05b6b7 !important}
+  .is-hover-3:hover{box-shadow:0 16px 36px rgba(20,33,61,.1) !important;transform:translateY(-3px) !important}
+  .is-hover-4:hover{color:#06cacb !important}
+  .is-hover-5:hover{color:#7ce9ea !important}
+  .is-hover-6:hover{background:#06cacb !important;color:#08313a !important}
+  .is-hover-7:hover{transform:scale(1.08) !important}
+}
+.is-focus-1:focus{border-color:#06cacb !important;box-shadow:0 0 0 3px rgba(6,202,203,.15) !important}
