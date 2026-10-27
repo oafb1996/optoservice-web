@@ -1,0 +1,144 @@
+# Panel de administración: https://app.pagescms.org
+# Cada cambio guardado en el panel se publica solo en optoservicenic.com en 1-2 minutos.
+
+media:
+  input: assets/uploads
+  output: /assets/uploads
+
+content:
+  - name: promociones
+    label: Promociones del mes
+    type: file
+    path: content/promociones.json
+    format: json
+    fields:
+      - name: promociones
+        label: Promociones
+        type: object
+        list: true
+        description: Se muestran en este orden. Las vencidas desaparecen solas de la web.
+        fields:
+          - name: activa
+            label: Mostrar en la web
+            type: boolean
+            default: true
+          - name: imagen
+            label: Imagen o flyer
+            type: image
+            description: Cuadrada o vertical, como las de Instagram.
+          - name: titulo
+            label: Título
+            type: string
+            description: "Ej.: Examen visual + lentes completos"
+          - name: precio
+            label: Precio u oferta
+            type: string
+            description: "Ej.: C$ 1,500 · 2x1 · 20% de descuento"
+          - name: descripcion
+            label: Descripción
+            type: text
+          - name: vence
+            label: Válida hasta
+            type: date
+            description: Al día siguiente deja de mostrarse. Déjalo vacío si no tiene fecha de fin.
+          - name: mensaje
+            label: Mensaje de WhatsApp
+            type: string
+            description: Opcional. Si lo dejas vacío se envía "Me interesa la promoción" con el título.
+
+  - name: fotos
+    label: Fotos de la página
+    type: file
+    path: content/fotos.json
+    format: json
+    fields:
+      - name: segundos
+        label: Segundos entre fotos
+        type: number
+        default: 5
+        description: Cada cuánto cambia la foto en los carruseles (entre 3 y 20).
+      - name: portada
+        label: Portada (foto grande de arriba)
+        type: object
+        list: true
+        description: Fotos verticales. Si hay más de una, rotan solas.
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            options:
+              values:
+                - { value: arriba, label: Arriba (caras) }
+                - { value: centro, label: Centro }
+                - { value: abajo, label: Abajo }
+      - name: servicios
+        label: Servicios (foto horizontal junto al título)
+        type: object
+        list: true
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            options:
+              values:
+                - { value: arriba, label: Arriba (caras) }
+                - { value: centro, label: Centro }
+                - { value: abajo, label: Abajo }
+      - name: examen
+        label: Examen visual (foto horizontal)
+        type: object
+        list: true
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            options:
+              values:
+                - { value: arriba, label: Arriba (caras) }
+                - { value: centro, label: Centro }
+                - { value: abajo, label: Abajo }
+      - name: nosotros
+        label: Nosotros (foto vertical)
+        type: object
+        list: true
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            options:
+              values:
+                - { value: arriba, label: Arriba (caras) }
+                - { value: centro, label: Centro }
+                - { value: abajo, label: Abajo }

@@ -1,0 +1,15 @@
+{
+  "segundos": 5,
+  "portada": [
+    { "imagen": "/assets/uploads/portada-paciente.jpg", "descripcion": "Paciente con lentes en Opto Service" }
+  ],
+  "servicios": [
+    { "imagen": "/assets/uploads/servicios-floral-kids.jpg", "descripcion": "Montura Floral Kids disponible en Opto Service" }
+  ],
+  "examen": [
+    { "imagen": "/assets/uploads/examen-nina.jpg", "descripcion": "Niña sonriendo con lentes nuevos" }
+  ],
+  "nosotros": [
+    { "imagen": "/assets/uploads/nosotros-nino.jpg", "descripcion": "Niño con lentes Floral Kids en Opto Service" }
+  ]
+}
