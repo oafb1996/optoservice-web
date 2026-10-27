@@ -1,0 +1,43 @@
+# Checklist de mejoras — optoservicenic.com
+
+Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al publicarlo.
+
+## Nuevas funciones
+
+- [x] **Promociones del mes**: sección propia, administrable desde Pages CMS, con fecha de vencimiento (se ocultan solas) y botón de WhatsApp por promoción.
+- [x] **Carruseles de fotos** en portada, servicios, examen y nosotros, administrables desde Pages CMS.
+- [x] **Optimización automática de imágenes** subidas desde el panel (WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.
+- [ ] Conectar Pages CMS al repositorio e invitar a administración y gerencia *(lo hace el dueño de la cuenta; ver README)*.
+
+## 🔴 Prioridad alta
+
+- [x] Quitar el ícono 🔇 de Instagram de las fotos (recortado). *Pendiente: reemplazarlas por las fotos originales cuando estén disponibles.*
+- [x] Mostrar de inmediato el texto de la portada en móvil (sin animación de entrada) para mejorar la velocidad percibida.
+- [x] Reducir el peso de las fotos (WebP, varios tamaños, carga diferida de las que están más abajo).
+- [ ] Formulario de empresas confiable: enviarlo por WhatsApp o con un servicio como Web3Forms/Formspree.
+
+## 🟠 Importante
+
+- [x] Contraste de colores: etiquetas turquesa sobre fondos claros, botones de WhatsApp y textos pequeños.
+- [ ] Datos estructurados de "Óptica" (LocalBusiness) para las dos sucursales.
+- [ ] `sitemap.xml` y `robots.txt`.
+- [ ] Alta en Google Search Console.
+- [ ] Enlazar la web desde el perfil de Google Business.
+- [ ] Mapas con el pin exacto de cada sucursal (desde Google Business).
+- [ ] Elementos de confianza: quién atiende (nombre, título, foto), reseñas de pacientes, fotos reales de las sucursales.
+
+## 🟡 Conversión y contenido
+
+- [ ] Botón de WhatsApp en cada sucursal con mensaje para Masaya / Diriomo.
+- [ ] Que cada servicio abra WhatsApp con un mensaje sobre ese servicio.
+- [ ] Más preguntas frecuentes: precio del examen, formas de pago, convenios o seguros, tiempo de entrega de los lentes.
+- [ ] Variar la frase "De todas las edades", que se repite tres veces.
+- [x] Año del pie de página automático.
+- [ ] Medir visitas y clics a WhatsApp (Cloudflare Web Analytics o GoatCounter).
+
+## 🔧 Técnicos
+
+- [x] Al saltar desde el menú, la etiqueta de cada sección ya no queda tapada por la barra superior.
+- [x] Etiqueta `<main>` y tamaño declarado de las imágenes.
+- [x] Logo liviano (antes 1543 px para mostrarse a 82 px).
+- [x] Imagen para compartir en WhatsApp/Facebook en formato 1200×630.

@@ -146,7 +146,7 @@
     [data-navlink]:hover{color:#fff}
     [data-navlink]:hover::after{transform:scaleX(1)}
     /* 5 · service row arrow slide + number glow (needs parent:hover child — cannot be inline) */
-    [data-srow]:hover [data-arrow]{transform:translateX(9px);color:#06cacb}
+    [data-srow]:hover [data-arrow]{transform:translateX(9px);color:#037576}
     [data-srow]:hover [data-snum]{color:#14213d}
     /* 6 · button shine sweep (needs ::before + :hover — cannot be inline) */
     [data-shine]::before{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-22deg);transition:left .65s cubic-bezier(.22,.61,.36,1);pointer-events:none}
@@ -160,14 +160,14 @@
     [data-tap]{transition:transform .15s ease, box-shadow .2s ease, background .2s ease}
     [data-tap]:active{transform:scale(.97)}
     @media (hover:none){
-      [data-srow] [data-arrow]{color:#06cacb;transform:translateX(3px)}
+      [data-srow] [data-arrow]{color:#037576;transform:translateX(3px)}
       [data-srow]:active{background:#fff;box-shadow:0 12px 30px rgba(20,33,61,.12)}
     }
     /* MOBILE 3 · services become tappable cards on narrow screens */
     @media (max-width:880px){
       [data-services]{border-top:none !important;display:flex !important;flex-direction:column;gap:11px}
       [data-srow]{background:#fff;border-radius:16px;border-bottom:none !important;padding:18px 16px !important;box-shadow:0 5px 16px rgba(20,33,61,.06);gap:14px !important;align-items:center}
-      [data-srow] [data-snum]{width:40px;height:40px;border-radius:11px;background:#e3f7f7;display:flex;align-items:center;justify-content:center;font-size:1.1rem !important;color:#04898a !important}
+      [data-srow] [data-snum]{width:40px;height:40px;border-radius:11px;background:#e3f7f7;display:flex;align-items:center;justify-content:center;font-size:1.1rem !important;color:#037576 !important}
       [data-srow]:active{transform:scale(.985)}
       /* MOBILE 4 · full-width hero buttons */
       [data-hero-grid] [data-reveal] a[data-shine],[data-hero-cta]{flex:1 1 100%;text-align:center}
@@ -200,3 +200,45 @@
   .is-hover-7:hover{transform:scale(1.08) !important}
 }
 .is-focus-1:focus{border-color:#06cacb !important;box-shadow:0 0 0 3px rgba(6,202,203,.15) !important}
+
+[hidden]{display:none !important}
+
+/* Anclas del menú: que la barra fija no tape el inicio de cada sección */
+section[id]{scroll-margin-top:24px}
+
+/* Carruseles de fotos (contenido en content/fotos.json) */
+[data-carousel]{position:relative}
+[data-carousel] .slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 1s ease}
+[data-carousel] .slide.is-active{opacity:1}
+.carousel-dots{position:absolute;right:10px;bottom:10px;z-index:2;display:flex;padding:0 4px;border-radius:20px;background:rgba(10,20,40,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.carousel-dots button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.carousel-dots button::before{content:"";width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.6);transition:width .3s ease,background .3s ease}
+.carousel-dots button[aria-current="true"]::before{width:18px;background:#fff}
+@media (prefers-reduced-motion: reduce){ [data-carousel] .slide{transition:none} }
+
+/* Promociones del mes (contenido en content/promociones.json) */
+.promos{background:#fff;padding:var(--sec-pad)}
+.promos-inner{max-width:1180px;margin:0 auto;padding:0 22px}
+.promos-head{text-align:center;max-width:640px;margin:0 auto 44px}
+.eyebrow{color:#037576;font-weight:600;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase}
+.section-title{font-weight:800;font-size:clamp(2rem,4vw,2.9rem);line-height:1.06;color:#14213d;letter-spacing:-.02em;margin-top:12px}
+.section-lead{font-weight:400;color:#5a6580;font-size:1.05rem;line-height:1.6;margin-top:14px}
+.promo-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,360px));justify-content:center;align-items:start;gap:22px}
+.promo-card{display:flex;flex-direction:column;background:#fff;border:1px solid #e2e5ea;border-radius:20px;overflow:hidden;box-shadow:0 14px 34px rgba(20,33,61,.08)}
+.promo-media{background:#eef2f6}
+.promo-media img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain}
+.promo-body{flex:1;display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px}
+.promo-price{align-self:flex-start;background:#e3f7f7;color:#037576;font-weight:700;font-size:.95rem;padding:6px 12px;border-radius:30px}
+.promo-title{font-weight:700;font-size:1.2rem;line-height:1.25;color:#14213d}
+.promo-text{color:#5a6580;font-size:.97rem;line-height:1.55}
+.promo-date{color:#677389;font-size:.85rem}
+.promo-cta{margin-top:auto;text-align:center;background:#06cacb;color:#08313a;font-weight:700;padding:13px;border-radius:14px;transition:background .2s,transform .15s}
+.promo-body > :nth-last-child(2){margin-bottom:8px}
+.promo-cta:active{transform:scale(.97)}
+@media (hover: hover){ .promo-cta:hover{background:#05b6b7} }
+@media (max-width: 879.98px){
+  .promo-list{display:flex;justify-content:flex-start;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:22px;gap:14px;margin:0 -22px;padding:4px 22px 18px;scrollbar-width:none}
+  .promo-list::-webkit-scrollbar{display:none}
+  .promo-card{flex:0 0 82%;scroll-snap-align:start}
+  .promo-card:only-child{flex-basis:100%}
+}
