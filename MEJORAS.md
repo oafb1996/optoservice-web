@@ -31,7 +31,7 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [ ] Botón de WhatsApp en cada sucursal con mensaje para Masaya / Diriomo.
 - [ ] Que cada servicio abra WhatsApp con un mensaje sobre ese servicio.
 - [ ] Más preguntas frecuentes: precio del examen, formas de pago, convenios o seguros, tiempo de entrega de los lentes.
-- [ ] Variar la frase "De todas las edades", que se repite tres veces.
+- [x] Variar la frase "De todas las edades": se conserva en el recuadro grande de la portada y en las preguntas frecuentes.
 - [x] Año del pie de página automático.
 - [ ] Medir visitas y clics a WhatsApp (Cloudflare Web Analytics o GoatCounter).
 
