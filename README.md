@@ -1,6 +1,6 @@
 # optoservice-web
 
-Sitio web de **Opto Service** — Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua.
+Sitio web de **Opto Service** — https://optoservicenic.com (Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua).
 
 Sitio estático de una sola página (HTML + CSS + JavaScript sin dependencias). No requiere compilación.
 
@@ -31,5 +31,7 @@ python3 -m http.server 8000
 
 ## Publicación
 
-Al ser estático, se puede publicar con GitHub Pages (Settings → Pages → rama `main`, carpeta `/`),
-Netlify, Vercel o cualquier hosting. El archivo `.nojekyll` evita que GitHub Pages procese el sitio con Jekyll.
+Se publica con GitHub Pages desde la rama `main` (carpeta `/`): cada cambio en `main` queda en línea en uno o dos minutos.
+
+- `CNAME` define el dominio propio `optoservicenic.com`. No borrarlo.
+- `.nojekyll` evita que GitHub Pages procese el sitio con Jekyll.
