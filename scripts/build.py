@@ -213,12 +213,20 @@ def render_promos(items, optimize, today):
 def load_json(name):
     path = ROOT / 'content' / name
     try:
-        return json.loads(path.read_text(encoding='utf-8'))
+        raw = path.read_text(encoding='utf-8')
     except FileNotFoundError:
         warn(f'no existe content/{name}')
         return {}
+    if not raw.strip():  # Pages CMS deja el archivo vacío al borrar el último elemento de la lista
+        return {}
+    try:
+        data = json.loads(raw)
     except json.JSONDecodeError as e:
         sys.exit(f'ERROR: content/{name} no es un JSON válido: {e}')
+    if not isinstance(data, dict):
+        warn(f'content/{name} no tiene el formato esperado; se ignora')
+        return {}
+    return data
 
 
 def main():
