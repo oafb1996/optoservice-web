@@ -4,11 +4,6 @@
     {
       "imagen": "/assets/uploads/portada-paciente.jpg",
       "descripcion": "Paciente con lentes en Opto Service"
-    },
-    {
-      "imagen": "/assets/uploads/IMG_3451.jpeg",
-      "descripcion": "Shushi y Tofu",
-      "enfoque": "arriba"
     }
   ],
   "servicios": [
