@@ -25,7 +25,7 @@ python3 -m http.server 8000
 ## Datos que conviene revisar al editar
 
 - **WhatsApp / teléfono:** `50584024868` (enlaces `wa.me` y `tel:` en `index.html`)
-- **Correo de afiliaciones:** `afiliaciones@optoservice.com` (en `assets/js/main.js`)
+- **Correo de afiliaciones:** `afiliaciones@optoservicenic.com` (en `assets/js/main.js`)
 - **Horarios y direcciones:** sección `#sucursales` y pie de página en `index.html`
 - **Redes sociales:** Instagram `@optoservicenic`, Facebook, TikTok `@optoservice`
 

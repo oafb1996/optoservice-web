@@ -48,7 +48,7 @@
     e.preventDefault();
     var fd = new FormData(form);
     var g = function (k) { return (fd.get(k) || '').toString().trim(); };
-    var to = 'afiliaciones@optoservice.com';
+    var to = 'afiliaciones@optoservicenic.com';
     var subject = 'Solicitud de afiliación – ' + (g('empresa') || 'Empresa');
     var body = [
       'Nueva solicitud de afiliación desde el sitio web:',
