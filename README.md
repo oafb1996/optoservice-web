@@ -72,6 +72,8 @@ Para activarlo, cuando el backend esté desplegado, editar `content/chat.json`:
 
 GitHub Pages con origen **GitHub Actions** (Settings → Pages → Source). El workflow `Publicar sitio` se ejecuta en cada cambio en `main` y además cada noche a las 00:10 (hora de Nicaragua) para retirar las promociones vencidas. Si una compilación falla, el sitio sigue mostrando la última versión publicada.
 
+Cada script y hoja de estilos se publica con una huella de su contenido (`main.js?v=a1b2c3d4`, hecho por `scripts/build.py`), para que los navegadores no sigan usando una versión vieja guardada en memoria (GitHub Pages permite guardarla 10 minutos). La página lleva además `<meta name="build">` con un identificador de la versión publicada.
+
 ## Datos que conviene revisar al editar
 
 - **WhatsApp / teléfono:** `50584024868` (enlaces `wa.me` y `tel:` en `index.html`, y `WHATSAPP` en `scripts/build.py`)
