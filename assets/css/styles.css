@@ -242,3 +242,19 @@ section[id]{scroll-margin-top:24px}
   .promo-card{flex:0 0 82%;scroll-snap-align:start}
   .promo-card:only-child{flex-basis:100%}
 }
+
+/* Asistente de chat: lanzadores (el panel está en chat.css y se carga al abrirlo) */
+.chat-launcher{display:var(--fab-display);position:fixed;right:24px;bottom:96px;z-index:120;align-items:center;gap:9px;height:48px;padding:0 18px 0 13px;border:0;border-radius:30px;background:#fff;color:#14213d;font:600 .95rem 'Parkinsans',system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(20,33,61,.28),0 0 0 1px rgba(20,33,61,.06);transition:transform .2s ease,box-shadow .2s ease}
+.chat-launcher svg{color:#037576}
+.chat-launcher:focus-visible,.chat-bar-btn:focus-visible{outline:3px solid #06cacb;outline-offset:2px}
+@media (hover: hover){ .chat-launcher:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(20,33,61,.34),0 0 0 1px rgba(20,33,61,.08)} }
+.chat-bar-btn{flex:1.1;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(6,202,203,.55);background:rgba(6,202,203,.12);color:#fff;font:600 1rem 'Parkinsans',system-ui,sans-serif;padding:14px;border-radius:14px;cursor:pointer;transition:transform .15s ease}
+.chat-bar-btn svg{color:#06cacb}
+.chat-bar-btn:active{transform:scale(.96)}
+/* con tres botones en la barra, un poco más compactos para que quepan en pantallas de 360 px */
+[data-mobilebar]:has(.chat-bar-btn){gap:8px !important;padding-left:10px !important;padding-right:10px !important}
+[data-mobilebar]:has(.chat-bar-btn) > a,[data-mobilebar]:has(.chat-bar-btn) > .chat-bar-btn{flex:1 1 auto !important;padding:14px 6px !important;font-size:.92rem !important;gap:6px !important;white-space:nowrap}
+/* pantallas angostas (<390 px): sin íconos en la barra para que quepan los tres botones en una línea */
+@media (max-width: 389.98px){
+  [data-mobilebar]:has(.chat-bar-btn) svg{display:none}
+}

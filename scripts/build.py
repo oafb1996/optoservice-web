@@ -31,7 +31,7 @@ except ImportError:
     pass
 
 ROOT = Path(__file__).resolve().parent.parent
-EXCLUDE = {'.git', '.github', '.gitignore', '.pages.yml', 'scripts', 'content', '_site', 'README.md', 'MEJORAS.md'}
+EXCLUDE = {'.git', '.github', '.gitignore', '.pages.yml', 'scripts', 'content', 'docs', '_site', 'README.md', 'MEJORAS.md'}
 WIDTHS = (480, 800, 1200)
 WHATSAPP = '50584024868'
 NICARAGUA = timezone(timedelta(hours=-6))
@@ -51,6 +51,9 @@ SLOTS = {
 }
 ENFOQUE = {'arriba': '50% 22%', 'centro': '50% 50%', 'abajo': '50% 80%'}
 PROMO_SIZES = '(max-width: 879px) 82vw, 360px'
+WA_GENERAL = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quiero agendar un examen visual. ¿Me ayudan con la cita?', safe='')
+CHAT_ICON = ('<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" '
+             'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>')
 
 warnings = []
 
@@ -217,6 +220,48 @@ def render_promos(items, optimize, today):
     return cards
 
 
+def render_chat(cfg):
+    """Lanzadores y configuración del asistente de chat.
+
+    Devuelve None (y no se agrega nada a la página) si content/chat.json no lo activa
+    o si algún dato es dudoso: ante la duda, el chat queda apagado.
+    """
+    if cfg.get('activo') is not True:
+        return None
+    api = text(cfg.get('apiUrl')).rstrip('/')
+    https_ok = re.fullmatch(r'https://[A-Za-z0-9.-]+(:\d+)?(/[A-Za-z0-9._~/-]*)?', api)
+    local_ok = re.fullmatch(r'http://(localhost|127\.0\.0\.1)(:\d+)?(/[A-Za-z0-9._~/-]*)?', api)
+    if not (https_ok or local_ok):
+        warn('content/chat.json: "apiUrl" debe empezar con https://; el asistente queda apagado')
+        return None
+    site_key = text(cfg.get('turnstileSiteKey'))
+    if site_key and not re.fullmatch(r'[0-9A-Za-z_-]{10,64}', site_key):
+        warn('content/chat.json: "turnstileSiteKey" no es válida; el asistente queda apagado')
+        return None
+    if not site_key and not local_ok:
+        warn('content/chat.json: falta "turnstileSiteKey"; el asistente queda apagado')
+        return None
+    privacy = text(cfg.get('privacidadUrl'))
+    if privacy and not re.fullmatch(r'(https://[^\s"<>\']+|/[A-Za-z0-9._~/#-]*)', privacy):
+        warn('content/chat.json: "privacidadUrl" no es válida; se omite el enlace')
+        privacy = ''
+    conf = {'apiUrl': api, 'turnstileSiteKey': site_key, 'whatsappUrl': WA_GENERAL}
+    if privacy:
+        conf['privacyUrl'] = privacy
+    timeout = cfg.get('timeoutMs')
+    if isinstance(timeout, (int, float)) and not isinstance(timeout, bool) and 1000 <= timeout <= 120000:
+        conf['timeoutMs'] = int(timeout)  # solo para pruebas
+    wa = attr(WA_GENERAL)
+    return {
+        'chat-launcher': [f'<button type="button" class="chat-launcher" data-chat-open data-chat-fallback="{wa}" '
+                          f'aria-haspopup="dialog" aria-label="Abrir el asistente virtual">{CHAT_ICON}<span>Asistente</span></button>'],
+        'chat-bar': [f'<button type="button" class="chat-bar-btn" data-chat-open data-chat-fallback="{wa}" '
+                     f'aria-haspopup="dialog">{CHAT_ICON}Asistente</button>'],
+        'chat-config': ['<script type="application/json" id="chat-config">'
+                        + json.dumps(conf, ensure_ascii=False).replace('<', '\\u003c') + '</script>'],
+    }
+
+
 def load_json(name):
     path = ROOT / 'content' / name
     try:
@@ -276,9 +321,15 @@ def main():
     if cards:
         page = page.replace('data-promos hidden', 'data-promos').replace(' data-promo-link hidden', ' data-promo-link')
 
+    chat = render_chat(load_json('chat.json'))
+    if chat:
+        for name, lines in chat.items():
+            page = replace_block(page, name, lines)
+
     (out / 'index.html').write_text(page, encoding='utf-8')
     print(f'Sitio generado en {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}: '
           f'{len(optimize.cache)} imágenes optimizadas, {sum(1 for c in cards if c.startswith("<article"))} promociones vigentes'
+          + (', asistente de chat ACTIVO' if chat else '')
           + (f', {len(warnings)} avisos' if warnings else ''))
 
 

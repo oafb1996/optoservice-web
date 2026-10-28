@@ -1,0 +1,72 @@
+/* Panel del asistente de chat. Se carga solo cuando alguien abre el chat (assets/js/chat.js). */
+
+.oc-root{position:fixed;z-index:140;right:24px;bottom:24px;width:380px;max-width:calc(100vw - 32px);height:min(620px,calc(100dvh - 48px));display:flex;flex-direction:column;background:#f4f6fa;color:#14213d;border-radius:20px;overflow:hidden;box-shadow:0 24px 70px rgba(10,20,40,.38),0 0 0 1px rgba(20,33,61,.08);font-family:'Parkinsans',system-ui,sans-serif;opacity:0;transform:translateY(16px) scale(.98);transition:opacity .22s ease,transform .22s ease}
+.oc-root.is-open{opacity:1;transform:none}
+.oc-root *{box-sizing:border-box}
+
+/* Encabezado */
+.oc-head{flex:none;display:flex;align-items:center;gap:12px;padding:12px 8px 12px 16px;background:#14213d;color:#fff}
+.oc-avatar{flex:none;width:40px;height:40px;border-radius:50%;background:#06cacb;color:#08313a;display:flex;align-items:center;justify-content:center}
+.oc-titles{flex:1;min-width:0}
+.oc-title{font-weight:700;font-size:1rem;line-height:1.2;outline:none}
+.oc-sub{font-size:.78rem;color:#b4bfd3;margin-top:2px}
+.oc-close{flex:none;width:44px;height:44px;border:0;border-radius:12px;background:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.oc-close:focus-visible,.oc-send:focus-visible,.oc-link:focus-visible,.oc-wa:focus-visible,.oc-retry:focus-visible{outline:3px solid #06cacb;outline-offset:2px}
+
+/* Aviso de privacidad */
+.oc-notice{flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:9px 16px;background:#e9f8f8;color:#1f3056;border-bottom:1px solid #d3eeee;font-size:.76rem;line-height:1.4}
+.oc-notice a{color:#036f70;font-weight:600;text-decoration:underline}
+.oc-link{flex:none;background:none;border:0;padding:11px 2px;margin:-8px 0;font:inherit;font-weight:600;color:#036f70;text-decoration:underline;cursor:pointer;white-space:nowrap}
+
+/* Conversación */
+.oc-log{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.oc-msg{max-width:86%;padding:10px 13px;border-radius:16px;font-size:.95rem;line-height:1.45;overflow-wrap:anywhere}
+.oc-msg a{text-decoration:underline;text-underline-offset:2px}
+.oc-bot{align-self:flex-start;background:#fff;border:1px solid #e2e5ea;border-bottom-left-radius:5px;color:#14213d}
+.oc-bot a{color:#036f70;font-weight:600}
+.oc-me{align-self:flex-end;background:#06cacb;color:#08313a;border-bottom-right-radius:5px}
+.oc-me a{color:inherit;font-weight:600}
+.oc-note{align-self:center;max-width:92%;text-align:center;font-size:.8rem;line-height:1.45;color:#5a6580;padding:2px 6px}
+.oc-note.is-error{background:#fdecec;color:#8a1c1c;border-radius:12px;padding:9px 12px}
+.oc-note.is-ok{background:#e3f7f7;color:#036f70;border-radius:12px;padding:9px 12px}
+.oc-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+.oc-wa,.oc-retry{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:12px;font:inherit;font-weight:700;font-size:.92rem;text-decoration:none !important;cursor:pointer;border:0}
+.oc-wa{background:#25D366;color:#0b3d1f !important}
+.oc-retry{background:#14213d;color:#fff}
+.oc-bot .oc-wa{margin-top:10px}
+.oc-ts{align-self:center;min-height:2px}
+
+/* Escribiendo… */
+.oc-typing{align-self:flex-start;display:flex;gap:5px;align-items:center;padding:13px 15px;background:#fff;border:1px solid #e2e5ea;border-radius:16px;border-bottom-left-radius:5px}
+.oc-typing i{width:7px;height:7px;border-radius:50%;background:#93a0b8;animation:oc-bounce 1.2s infinite ease-in-out}
+.oc-typing i:nth-child(2){animation-delay:.18s}
+.oc-typing i:nth-child(3){animation-delay:.36s}
+@keyframes oc-bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+/* Entrada de texto */
+.oc-foot{flex:none;padding:10px 12px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e2e5ea}
+.oc-form{display:flex;align-items:flex-end;gap:8px}
+.oc-input{flex:1;min-width:0;min-height:44px;max-height:120px;resize:none;border:1.5px solid #7d8aa1;border-radius:14px;padding:11px 13px;font:inherit;font-size:16px;line-height:1.35;color:#14213d;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+.oc-input::placeholder{color:#677389}
+.oc-input:focus{border-color:#037576;box-shadow:0 0 0 3px rgba(6,202,203,.3)}
+.oc-input:disabled{background:#eef1f5;color:#677389}
+.oc-send{flex:none;width:44px;height:44px;border:0;border-radius:50%;background:#06cacb;color:#08313a;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s,transform .15s}
+.oc-send:disabled{opacity:.4;cursor:default}
+.oc-send:not(:disabled):active{transform:scale(.94)}
+.oc-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:26px;margin-top:2px;font-size:.74rem;color:#677389}
+.oc-meta a{color:#036f70;font-weight:600;text-decoration:underline;padding:6px 0}
+
+/* Móvil: pantalla completa; la altura sigue al teclado (assets/js/chat.js ajusta --oc-h y --oc-top) */
+@media (max-width: 879.98px){
+  .oc-root{left:0;right:0;bottom:auto;top:var(--oc-top,0);width:auto;max-width:none;height:var(--oc-h,100dvh);border-radius:0;box-shadow:none;transform:translateY(24px)}
+  .oc-head{padding-top:calc(12px + env(safe-area-inset-top))}
+  .oc-msg{max-width:90%}
+}
+html.oc-lock,html.oc-lock body{overflow:hidden}
+html.oc-open .chat-launcher{display:none !important}
+
+@media (prefers-reduced-motion: reduce){
+  .oc-root{transition:none;transform:none}
+  .oc-log{scroll-behavior:auto}
+  .oc-typing i{animation:none;opacity:.8}
+}

@@ -41,3 +41,15 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] Etiqueta `<main>` y tamaño declarado de las imágenes.
 - [x] Logo liviano (antes 1543 px para mostrarse a 82 px).
 - [x] Imagen para compartir en WhatsApp/Facebook en formato 1200×630.
+- [ ] Contraste del borde de los campos del formulario de empresas (1,3:1; las pautas de accesibilidad piden 3:1). En el chat ya está corregido.
+
+## 💬 Asistente de chat en la web (chatbot de osops)
+
+Contrato con osops en `docs/contrato-chat-web.md`. El widget está listo y **apagado** hasta que el backend exista.
+
+- [x] Widget de la web: burbuja en escritorio, botón "Asistente" en la barra del móvil, panel accesible, carga diferida (no cuesta velocidad), Turnstile, manejo de errores y traspaso a WhatsApp.
+- [x] Probado con un simulador del contrato (`scripts/chat-mock.py`) en escritorio y en móviles de 320 a 430 px, y con axe (accesibilidad) con el panel abierto.
+- [ ] Backend en osops: rutas `/session` y `/message`, tablas, límites, CORS, Turnstile y tope de gasto (estimado 3-4 días).
+- [ ] Cuenta de Cloudflare y widget de Turnstile (la clave secreta va en Render; a la web solo llega la *site key*).
+- [ ] Revisar con asesoría legal y publicar la política de privacidad (`docs/politica-privacidad-borrador.md`).
+- [ ] Activar en `content/chat.json` y probar de punta a punta contra osops.
