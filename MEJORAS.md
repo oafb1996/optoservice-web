@@ -15,7 +15,8 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] Quitar el ícono 🔇 de Instagram de las fotos (recortado). *Pendiente: reemplazarlas por las fotos originales cuando estén disponibles.*
 - [x] Mostrar de inmediato el texto de la portada en móvil (sin animación de entrada) para mejorar la velocidad percibida.
 - [x] Reducir el peso de las fotos (WebP, varios tamaños, carga diferida de las que están más abajo).
-- [ ] Formulario de empresas por **correo automático** (Web3Forms) hacia `afiliaciones@optoservicenic.com`: código listo y probado; falta crear la clave pública y ponerla en `data-access-key` del formulario.
+- [x] Formulario de empresas por **correo automático** (Web3Forms): en línea con una clave de pruebas.
+- [ ] Cambiar la clave del formulario por una atada a `afiliaciones@optoservicenic.com` cuando ese buzón esté listo.
 
 ## 🟠 Importante
 
