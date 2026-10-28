@@ -258,3 +258,6 @@ section[id]{scroll-margin-top:24px}
 @media (max-width: 389.98px){
   [data-mobilebar]:has(.chat-bar-btn) svg{display:none}
 }
+
+/* Botón de envío mientras se procesa */
+[data-afil-form] button[disabled]{opacity:.7;cursor:wait !important}

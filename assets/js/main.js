@@ -41,29 +41,64 @@
     });
   });
 
-  // Formulario de afiliación: abre el correo con la solicitud lista
+  // Formulario de afiliación: se envía por correo con Web3Forms (https://web3forms.com).
+  // La clave pública (data-access-key en el <form>) hace que llegue a afiliaciones@optoservicenic.com.
   var form = document.querySelector('[data-afil-form]');
   var success = document.querySelector('[data-afil-success]');
+  var errorBox = form.querySelector('[data-afil-error]');
+  var sendBtn = form.querySelector('button[type="submit"]');
+  var sendLabel = sendBtn.textContent;
+
+  function showError(msg) {
+    errorBox.querySelector('[data-afil-error-text]').textContent = msg;
+    errorBox.hidden = false;
+  }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    errorBox.hidden = true;
+    var key = form.getAttribute('data-access-key');
+    if (!key) { showError('El envío del formulario no está disponible por ahora. Puedes'); return; }
+
     var fd = new FormData(form);
     var g = function (k) { return (fd.get(k) || '').toString().trim(); };
-    var to = 'afiliaciones@optoservicenic.com';
-    var subject = 'Solicitud de afiliación – ' + (g('empresa') || 'Empresa');
-    var body = [
-      'Nueva solicitud de afiliación desde el sitio web:',
-      '',
-      'Empresa: ' + g('empresa'),
-      'Persona de contacto: ' + g('contacto'),
-      'Correo: ' + g('correo'),
-      'Teléfono: ' + g('telefono'),
-      '',
-      'Mensaje:',
-      g('mensaje') || '(sin mensaje)'
-    ].join('\n');
-    window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    form.style.display = 'none';
-    success.hidden = false;
+    var payload = {
+      access_key: key,
+      subject: 'Solicitud de afiliación – ' + (g('empresa') || 'Empresa'),
+      from_name: 'Sitio web Opto Service',
+      botcheck: fd.get('botcheck') ? true : '',
+      email: g('correo'),
+      'Empresa': g('empresa'),
+      'Persona de contacto': g('contacto'),
+      'Teléfono': g('telefono') || '(no indicado)',
+      'Mensaje': g('mensaje') || '(sin mensaje)'
+    };
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Enviando…';
+    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 15000) : null;
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok || !data.success) throw new Error('rechazado');
+      });
+    }).then(function () {
+      form.reset();
+      form.style.display = 'none';
+      success.hidden = false;
+      success.focus();
+    }).catch(function () {
+      showError('No pudimos enviar tu solicitud. Revisa tu conexión e inténtalo de nuevo. También puedes');
+    }).then(function () {
+      if (timer) clearTimeout(timer);
+      sendBtn.disabled = false;
+      sendBtn.textContent = sendLabel;
+    });
   });
 
   // Año del pie de página

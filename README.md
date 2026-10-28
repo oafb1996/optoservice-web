@@ -75,7 +75,7 @@ GitHub Pages con origen **GitHub Actions** (Settings → Pages → Source). El w
 ## Datos que conviene revisar al editar
 
 - **WhatsApp / teléfono:** `50584024868` (enlaces `wa.me` y `tel:` en `index.html`, y `WHATSAPP` en `scripts/build.py`)
-- **Correo de afiliaciones:** `afiliaciones@optoservicenic.com` (en `assets/js/main.js`)
+- **Formulario de empresas:** se envía con [Web3Forms](https://web3forms.com). La clave pública está en `data-access-key` del `<form data-afil-form>` en `index.html`; el correo de destino lo define Web3Forms al crear la clave. **Hoy es un correo de pruebas**: cuando el buzón `afiliaciones@optoservicenic.com` esté listo, crear otra clave con ese correo y reemplazarla en `index.html`.
 - **Horarios y direcciones:** sección `#sucursales` y pie de página en `index.html`
 - **Redes sociales:** Instagram `@optoservicenic`, Facebook, TikTok `@optoservice`
 - **Dominio:** `CNAME` y el dominio configurado en Settings → Pages
