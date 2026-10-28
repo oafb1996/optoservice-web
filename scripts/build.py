@@ -52,6 +52,7 @@ SLOTS = {
 ENFOQUE = {'arriba': '50% 22%', 'centro': '50% 50%', 'abajo': '50% 80%'}
 PROMO_SIZES = '(max-width: 879px) 82vw, 360px'
 WA_GENERAL = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quiero agendar un examen visual. ¿Me ayudan con la cita?', safe='')
+WA_CHAT = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quisiera hablar con una persona del equipo.', safe='')
 CHAT_ICON = ('<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" '
              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 21 12z"/></svg>')
 
@@ -245,13 +246,13 @@ def render_chat(cfg):
     if privacy and not re.fullmatch(r'(https://[^\s"<>\']+|/[A-Za-z0-9._~/#-]*)', privacy):
         warn('content/chat.json: "privacidadUrl" no es válida; se omite el enlace')
         privacy = ''
-    conf = {'apiUrl': api, 'turnstileSiteKey': site_key, 'whatsappUrl': WA_GENERAL}
+    conf = {'apiUrl': api, 'turnstileSiteKey': site_key, 'whatsappUrl': WA_CHAT}
     if privacy:
         conf['privacyUrl'] = privacy
     timeout = cfg.get('timeoutMs')
     if isinstance(timeout, (int, float)) and not isinstance(timeout, bool) and 1000 <= timeout <= 120000:
         conf['timeoutMs'] = int(timeout)  # solo para pruebas
-    wa = attr(WA_GENERAL)
+    wa = attr(WA_CHAT)
     return {
         'chat-launcher': [f'<button type="button" class="chat-launcher" data-chat-open data-chat-fallback="{wa}" '
                           f'aria-haspopup="dialog" aria-label="Abrir el asistente virtual">{CHAT_ICON}<span>Asistente</span></button>'],
