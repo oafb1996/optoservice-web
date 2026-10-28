@@ -8,7 +8,7 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] **Carruseles de fotos** en portada, servicios, examen y nosotros, administrables desde Pages CMS.
 - [x] **Optimización automática de imágenes** subidas desde el panel (WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.
 - [x] Pages CMS conectado: administración y gerencia suben fotos y promociones desde el panel.
-- [ ] **Chatbot de WhatsApp** del otro sistema (osops): por definir cómo conectarlo con la web (ver conversación; depende de qué ofrece ese sistema).
+- [ ] **Asistente de chat en la web** (chatbot de osops): widget listo y apagado; falta el backend. Ver la sección del final.
 
 ## 🔴 Prioridad alta
 
