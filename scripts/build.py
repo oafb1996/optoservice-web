@@ -281,6 +281,37 @@ def load_json(name):
     return data
 
 
+def version_assets(out, page):
+    """Agrega a cada script y estilo una huella de su contenido (archivo.js?v=a1b2c3d4).
+
+    GitHub Pages deja que el navegador guarde los archivos 10 minutos (los celulares, a
+    veces más). Sin huella, un visitante podía ver la página nueva con el script viejo.
+    Con huella, cualquier cambio cambia la dirección y se descarga de inmediato.
+    El orden importa: main.js contiene la dirección de chat.js, y chat.js la de chat.css.
+    """
+    def stamp(path):
+        return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
+
+    def point(path, reference, target):
+        text = path.read_text(encoding='utf-8')
+        if reference not in text:
+            warn(f'{path.name}: no se encontró {reference}; no se le puso versión')
+            return
+        path.write_text(text.replace(reference, f'{reference[:-1]}?v={stamp(target)}{reference[-1]}'), encoding='utf-8')
+
+    assets = out / 'assets'
+    point(assets / 'js' / 'chat.js', "'assets/css/chat.css'", assets / 'css' / 'chat.css')
+    point(assets / 'js' / 'main.js', "'assets/js/chat.js'", assets / 'js' / 'chat.js')
+    for reference, target in (('href="assets/css/styles.css"', assets / 'css' / 'styles.css'),
+                              ('src="assets/js/main.js"', assets / 'js' / 'main.js')):
+        if page.count(reference) != 1:
+            warn(f'index.html: no se encontró {reference}; no se le puso versión')
+            continue
+        page = page.replace(reference, f'{reference[:-1]}?v={stamp(target)}"')
+    build_id = hashlib.sha1((page + stamp(assets / 'js' / 'main.js')).encode()).hexdigest()[:8]
+    return page.replace('<meta name="theme-color"', f'<meta name="build" content="{build_id}">\n<meta name="theme-color"', 1)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--out', default='_site', help='carpeta de salida (por defecto _site)')
@@ -326,6 +357,7 @@ def main():
         for name, lines in chat.items():
             page = replace_block(page, name, lines)
 
+    page = version_assets(out, page)
     (out / 'index.html').write_text(page, encoding='utf-8')
     print(f'Sitio generado en {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}: '
           f'{len(optimize.cache)} imágenes optimizadas, {sum(1 for c in cards if c.startswith("<article"))} promociones vigentes'
