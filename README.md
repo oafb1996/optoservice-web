@@ -25,6 +25,11 @@ assets/js/main.js           Menú móvil, FAQ, formulario, carruseles, animacion
 assets/img/                 Logo e imagen para compartir en redes
 assets/fonts/               Fuente Parkinsans (autoalojada)
 scripts/build.py            Genera el sitio publicable en _site/
+scripts/chat-mock.py        Simulador del canal web del asistente (para desarrollo y pruebas)
+docs/                       Contrato del chat web y borrador de política de privacidad (no se publican)
+content/chat.json           Interruptor y datos del asistente de chat       ← lo edita quien programa
+assets/js/chat.js           Panel del asistente (se descarga solo al abrirlo)
+assets/css/chat.css         Estilos del panel del asistente
 .pages.yml                  Formularios del panel de Pages CMS
 .github/workflows/          Publicación automática en GitHub Pages
 MEJORAS.md                  Checklist de mejoras pendientes
@@ -42,6 +47,26 @@ python3 -m http.server 8000 -d _site
 Abrir `index.html` sin compilar también funciona: muestra la primera foto por defecto de cada espacio y oculta las promociones.
 
 Para probar cómo se vería la página otro día (vencimiento de promociones): `python3 scripts/build.py --hoy 2026-12-01`.
+
+## Asistente de chat (apagado hasta que osops esté listo)
+
+La web trae un widget de chat que habla con el canal web del asistente de osops (el chatbot de WhatsApp). Está **apagado por defecto**: mientras `content/chat.json` diga `"activo": false`, no se agrega ni una línea a la página.
+
+Para activarlo, cuando el backend esté desplegado, editar `content/chat.json`:
+
+```json
+{
+  "activo": true,
+  "apiUrl": "https://osops.app/api/web-chat",
+  "turnstileSiteKey": "<site key pública de Cloudflare Turnstile>",
+  "privacidadUrl": "/privacidad.html"
+}
+```
+
+- Si algún dato es dudoso (URL que no sea `https://`, falta la clave de Turnstile, etc.), el chat **se queda apagado** y la compilación lo avisa.
+- Aparece una burbuja "Asistente" en escritorio y un tercer botón en la barra inferior del móvil. El código del panel se descarga solo cuando alguien lo abre.
+- Antes de activarlo: publicar la política de privacidad (`docs/politica-privacidad-borrador.md` es un borrador para revisión legal) y tener el backend de osops en producción.
+- El contrato entre la web y osops está en `docs/contrato-chat-web.md`. Para desarrollar sin osops: `python3 scripts/chat-mock.py` y, en una copia de pruebas, `apiUrl` apuntando a `http://127.0.0.1:8771/api/web-chat`.
 
 ## Publicación
 

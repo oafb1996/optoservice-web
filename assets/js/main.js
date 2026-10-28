@@ -154,6 +154,36 @@
     });
   });
 
+  // Asistente de chat: el código del panel se descarga solo cuando alguien lo abre
+  var chatOpeners = document.querySelectorAll('[data-chat-open]');
+  if (chatOpeners.length) {
+    var chatLoading = null;
+    var loadChat = function () {
+      if (window.OptoChat) return Promise.resolve();
+      if (!chatLoading) {
+        chatLoading = new Promise(function (ok, fail) {
+          var s = document.createElement('script');
+          s.src = 'assets/js/chat.js';
+          s.onload = function () { window.OptoChat ? ok() : fail(); };
+          s.onerror = function () { chatLoading = null; fail(); };
+          document.head.appendChild(s);
+        });
+      }
+      return chatLoading;
+    };
+    chatOpeners.forEach(function (btn) {
+      var warm = function () { loadChat().catch(function () {}); };
+      btn.addEventListener('pointerenter', warm, { once: true });
+      btn.addEventListener('touchstart', warm, { once: true, passive: true });
+      btn.addEventListener('click', function () {
+        loadChat().then(function () { window.OptoChat.open(btn); }, function () {
+          var wa = btn.getAttribute('data-chat-fallback');
+          if (wa) window.open(wa, '_blank', 'noopener');
+        });
+      });
+    });
+  }
+
   // Aparición suave al hacer scroll
   if (REDUCED || !('IntersectionObserver' in window)) return;
   var io = new IntersectionObserver(function (entries) {
