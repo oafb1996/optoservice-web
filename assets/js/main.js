@@ -86,11 +86,13 @@
       opener = from || null;
       sForm.reset();
       step = 1;
-      // Un enlace puede dejar elegido el servicio (por ejemplo, el recuadro de una foto)
-      var pre = from && from.getAttribute('data-servicio');
-      if (pre) {
-        sForm.querySelectorAll('input[name="servicio"]').forEach(function (r) { r.checked = r.value === pre; });
-      }
+      // Un enlace puede dejar elegidos el servicio (el recuadro de una foto) o la sucursal (su página)
+      ['servicio', 'sucursal'].forEach(function (field) {
+        var pre = from && from.getAttribute('data-' + field);
+        if (pre) {
+          sForm.querySelectorAll('input[name="' + field + '"]').forEach(function (r) { r.checked = r.value === pre; });
+        }
+      });
       setMenu(false);
       if (window.OptoChat && typeof window.OptoChat.close === 'function') window.OptoChat.close();
       render(false);
@@ -136,62 +138,64 @@
   // Se envía por correo con Web3Forms (https://web3forms.com). La clave pública está en
   // data-access-key del <form>; el correo de destino lo define la clave.
   var form = document.querySelector('[data-afil-form]');
-  var success = document.querySelector('[data-afil-success]');
-  var errorBox = form.querySelector('[data-afil-error]');
-  var sendBtn = form.querySelector('button[type="submit"]');
-  var sendLabel = sendBtn.textContent;
+  if (form) { // solo en el inicio
+    var success = document.querySelector('[data-afil-success]');
+    var errorBox = form.querySelector('[data-afil-error]');
+    var sendBtn = form.querySelector('button[type="submit"]');
+    var sendLabel = sendBtn.textContent;
 
-  function showError(msg) {
-    errorBox.querySelector('[data-afil-error-text]').textContent = msg;
-    errorBox.hidden = false;
-  }
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    errorBox.hidden = true;
-    var key = form.getAttribute('data-access-key');
-    if (!key) { showError('El envío del formulario no está disponible por ahora. Puedes'); return; }
+    function showError(msg) {
+      errorBox.querySelector('[data-afil-error-text]').textContent = msg;
+      errorBox.hidden = false;
+    }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errorBox.hidden = true;
+      var key = form.getAttribute('data-access-key');
+      if (!key) { showError('El envío del formulario no está disponible por ahora. Puedes'); return; }
 
-    var fd = new FormData(form);
-    var g = function (k) { return (fd.get(k) || '').toString().trim(); };
-    var payload = {
-      access_key: key,
-      subject: 'Solicitud de afiliación – ' + (g('empresa') || 'Empresa'),
-      from_name: 'Sitio web Opto Service',
-      botcheck: fd.get('botcheck') ? true : '',
-      email: g('correo'),
-      'Empresa': g('empresa'),
-      'Persona de contacto': g('contacto'),
-      'Teléfono': g('telefono') || '(no indicado)',
-      'Mensaje': g('mensaje') || '(sin mensaje)'
-    };
+      var fd = new FormData(form);
+      var g = function (k) { return (fd.get(k) || '').toString().trim(); };
+      var payload = {
+        access_key: key,
+        subject: 'Solicitud de afiliación – ' + (g('empresa') || 'Empresa'),
+        from_name: 'Sitio web Opto Service',
+        botcheck: fd.get('botcheck') ? true : '',
+        email: g('correo'),
+        'Empresa': g('empresa'),
+        'Persona de contacto': g('contacto'),
+        'Teléfono': g('telefono') || '(no indicado)',
+        'Mensaje': g('mensaje') || '(sin mensaje)'
+      };
 
-    sendBtn.disabled = true;
-    sendBtn.textContent = 'Enviando…';
-    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 15000) : null;
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Enviando…';
+      var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 15000) : null;
 
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: ctrl ? ctrl.signal : undefined
-    }).then(function (res) {
-      return res.json().catch(function () { return {}; }).then(function (data) {
-        if (!res.ok || !data.success) throw new Error('rechazado');
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok || !data.success) throw new Error('rechazado');
+        });
+      }).then(function () {
+        form.reset();
+        form.hidden = true;
+        success.hidden = false;
+        success.focus();
+      }).catch(function () {
+        showError('No pudimos enviar tu solicitud. Revisa tu conexión e inténtalo de nuevo. También puedes');
+      }).then(function () {
+        if (timer) clearTimeout(timer);
+        sendBtn.disabled = false;
+        sendBtn.textContent = sendLabel;
       });
-    }).then(function () {
-      form.reset();
-      form.hidden = true;
-      success.hidden = false;
-      success.focus();
-    }).catch(function () {
-      showError('No pudimos enviar tu solicitud. Revisa tu conexión e inténtalo de nuevo. También puedes');
-    }).then(function () {
-      if (timer) clearTimeout(timer);
-      sendBtn.disabled = false;
-      sendBtn.textContent = sendLabel;
     });
-  });
+  }
 
   // Año del pie de página
   document.querySelectorAll('[data-year]').forEach(function (el) {
@@ -346,7 +350,7 @@
       if (!chatLoading) {
         chatLoading = new Promise(function (ok, fail) {
           var s = document.createElement('script');
-          s.src = 'assets/js/chat.js';
+          s.src = '/assets/js/chat.js';
           s.onload = function () { window.OptoChat ? ok() : fail(); };
           s.onerror = function () { chatLoading = null; fail(); };
           document.head.appendChild(s);

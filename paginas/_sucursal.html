@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Plantilla de /masaya y /diriomo. Los datos ({{...}}) salen de content/sucursales.json (Pages CMS: Sucursales). -->
+<title>Óptica en {{nombre}} | Opto Service, examen visual y lentes</title>
+<meta name="description" content="{{descripcion}}">
+<meta name="theme-color" content="#f2ede8">
+<link rel="canonical" href="{{url}}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{url}}">
+<meta property="og:title" content="Opto Service {{nombre}} — Óptica y Optometría Médica">
+<meta property="og:description" content="{{descripcion}}">
+<meta property="og:image" content="https://optoservicenic.com/assets/img/compartir.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:locale" content="es_NI">
+<!--comun:recursos-->
+<!--/comun:recursos-->
+<script type="application/ld+json">
+{{jsonld}}
+</script>
+</head>
+<body>
+
+  <!--comun:cabecera-->
+  <!--/comun:cabecera-->
+  <main>
+  <section class="page-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Estás en">
+        <ol><li><a href="/">Inicio</a></li><li><a href="/#sucursales">Sucursales</a></li><li aria-current="page">{{nombre}}</li></ol>
+      </nav>
+      <div class="eyebrow">Sucursal {{nombre}}</div>
+      <h1 class="page-title">Óptica en {{nombre}}: Opto Service</h1>
+      <p class="lead">Óptica y optometría médica en {{lugar}}. Exámenes visuales completos, terapia visual, optometría pediátrica y lentes a tu medida, con un servicio honesto y cercano para toda la familia.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{wa}}" target="_blank" rel="noopener" data-agendar data-sucursal="{{nombre}}">Agenda tu cita en {{nombre}}</a>
+        <a class="btn btn-outline" href="{{direcciones}}" target="_blank" rel="noopener" data-direcciones="{{id}}">Cómo llegar<span class="sr-only"> a la sucursal de {{nombre}}</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="donde">
+    <div class="wrap branch-detail">
+      <article class="card branch">
+        <div class="branch-photo" data-carousel="{{id}}" data-interval="5000" hidden>
+          <!--fotos:{{id}}-->
+          <!--/fotos:{{id}}-->
+        </div>
+        <iframe class="branch-map is-tall" src="{{mapa}}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de la sucursal de {{nombre}}"></iframe>
+      </article>
+      <div class="branch-info">
+        <h2 class="h2 h2-sm" id="donde">Dónde estamos</h2>
+        <p class="branch-addr"><strong>{{direccion}}</strong>, {{lugar}}.</p>
+        {{como_llegar}}
+        <h3 class="info-title">Horario</h3>
+        <dl class="hours">
+          {{horario}}
+        </dl>
+        <h3 class="info-title">Contacto</h3>
+        <p class="branch-contact"><a href="tel:+50584024868">Llamar al 8402 4868</a> · <a href="{{wa}}" target="_blank" rel="noopener" data-agendar data-sucursal="{{nombre}}">WhatsApp</a></p>
+        <a class="btn btn-outline btn-sm" href="{{direcciones}}" target="_blank" rel="noopener" data-direcciones="{{id}}">Cómo llegar<span class="sr-only"> a la sucursal de {{nombre}}</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="servicios-sucursal">
+    <div class="wrap split">
+      <div class="services-intro">
+        <div class="eyebrow">Lo que hacemos</div>
+        <h2 class="h2 h2-sm" id="servicios-sucursal">Servicios en {{nombre}}</h2>
+        <p class="lead">Desde el examen de rutina hasta la rehabilitación visual especializada, con la atención que cada etapa de la vida necesita.</p>
+      </div>
+      <div class="card services-list">
+        <article class="service"><span class="num">01</span><div><h3>Examen visual completo</h3><p>Agudeza visual, refracción, salud ocular externa, estereopsis, visión cromática, binocularidad y acomodación.</p><a class="service-link" href="/#examen">Qué incluye el examen →</a></div></article>
+        <article class="service"><span class="num">02</span><div><h3>Ortóptica y Terapia Visual</h3><p>Tratamiento de estrabismo, ambliopía (ojo perezoso) e insuficiencia de convergencia con planes personalizados.</p><a class="service-link" href="/terapia-visual" data-requiere="terapia-visual">Conoce la terapia visual →</a></div></article>
+        <article class="service"><span class="num">03</span><div><h3>Optometría pediátrica</h3><p>Evaluación visual para niñas y niños, con un trato paciente y adaptado a cada edad.</p></div></article>
+        <article class="service"><span class="num">04</span><div><h3>Lentes oftálmicos</h3><p>Monturas y lentes graduados a tu medida, con asesoría honesta según tu estilo de vida.</p></div></article>
+        <article class="service"><span class="num">05</span><div><h3>Lentes de contacto</h3><p>Adaptación y control de lentes de contacto, con seguimiento para una visión cómoda y segura.</p></div></article>
+        <article class="service"><span class="num">06</span><div><h3>Atención oftalmológica</h3><p>También contamos con atención oftalmológica para el cuidado integral de la salud de tus ojos.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  {{resenas}}
+
+  <section class="sec faq" aria-labelledby="faq-sucursal">
+    <div class="wrap split">
+      <div class="faq-intro">
+        <div class="eyebrow">Preguntas frecuentes</div>
+        <h2 class="h2 h2-sm" id="faq-sucursal">Sobre la sucursal de {{nombre}}</h2>
+      </div>
+      <div class="faq-list">
+        <details name="faq" open>
+          <summary>¿Dónde queda Opto Service en {{nombre}}?<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>{{direccion}}, {{lugar}}. Puedes abrir la ruta en Google Maps con el botón "Cómo llegar".</p>
+        </details>
+        <details name="faq">
+          <summary>¿Cuál es el horario de atención?<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>{{horario_texto}}</p>
+        </details>
+        <details name="faq">
+          <summary>¿Necesito cita para el examen visual?<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>Puedes visitarnos en horario de atención, pero te recomendamos agendar por WhatsApp para asegurar tu espacio. Los domingos atendemos únicamente con cita previa.</p>
+        </details>
+        <details name="faq">
+          <summary>¿Atienden a niñas y niños?<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>Sí. Cuidamos los ojos de toda la familia, desde bebés hasta adultos mayores, con un trato paciente y adaptado a cada edad.</p>
+        </details>
+        <details name="faq">
+          <summary>¿Puedo ir a la otra sucursal?<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>Claro. También te atendemos en <a href="/{{otra_id}}">nuestra sucursal de {{otra_nombre}}</a>, con el mismo número de WhatsApp: 8402 4868.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec contact">
+    <div class="wrap split">
+      <div class="contact-copy">
+        <h2>Agenda tu cita en {{nombre}}</h2>
+        <p class="lead">Escríbenos por WhatsApp y con gusto te ayudamos a reservar tu examen o resolver cualquier duda.</p>
+      </div>
+      <div class="contact-actions">
+        <a class="btn btn-primary" href="{{wa}}" target="_blank" rel="noopener" data-agendar data-sucursal="{{nombre}}">Agendar por WhatsApp</a>
+        <a class="btn btn-outline" href="/{{otra_id}}">Ver la sucursal de {{otra_nombre}}</a>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!--comun:pie-->
+  <!--/comun:pie-->
+</body>
+</html>

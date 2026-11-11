@@ -240,6 +240,16 @@ a.photo-badge:focus-visible { outline: 2px solid var(--marino); outline-offset: 
 .pillar h3 { margin-top: 10px; font: 700 18px/1.2 var(--font); letter-spacing: -.02em; }
 .pillar p { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--texto); }
 
+/* Equipo (dentro de Nosotros) */
+.team-head { margin-top: 32px; }
+.team { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.member { background: #fff; color: var(--marino); border-radius: var(--radius); padding: 16px; }
+.member-photo { width: 88px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--lino-2); margin-bottom: 12px; }
+.member-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.member h3 { font: 700 17px/1.25 var(--font); letter-spacing: -.02em; }
+.member p { margin-top: 4px; font-size: 14px; line-height: 1.45; color: var(--texto); }
+.member .member-title { color: var(--teal); font-weight: 600; }
+
 /* ===== Señales ===== */
 .signs { margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0 40px; }
 .sign { display: flex; gap: 16px; padding: 22px 0; border-top: 1px solid var(--marino); }
@@ -262,6 +272,9 @@ a.photo-badge:focus-visible { outline: 2px solid var(--marino); outline-offset: 
 .hours dt { color: var(--suave); }
 .hours dd { font-weight: 600; }
 .branch .btn { margin-top: 12px; }
+.branch-head h3 a { color: inherit; text-decoration: none; }
+.branch-head h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.branch-actions { display: flex; flex-wrap: wrap; gap: 0 10px; }
 
 /* ===== Preguntas frecuentes ===== */
 .faq { padding-bottom: var(--sec); }
@@ -404,3 +417,35 @@ details[open] .faq-icon::before { content: "–"; }
 @media (max-width: 359.98px) {
   .sheet-body fieldset.is-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== Páginas internas (sucursales, terapia visual, 404) ===== */
+.page-hero { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
+.page-hero .lead { max-width: 640px; font-size: clamp(17px, 1.8vw, 19px); line-height: 1.6; }
+.page-title { margin-top: 14px; font: 700 clamp(38px, 6vw, 72px)/.98 var(--font); letter-spacing: -.045em; text-wrap: balance; max-width: 900px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 0 0 22px; padding: 0; list-style: none; font-size: 14px; color: var(--suave); }
+.crumbs li + li::before { content: "/"; margin: 0 8px; color: var(--raya); }
+.crumbs a { color: var(--marino); text-underline-offset: 3px; }
+.crumbs [aria-current] { color: var(--suave); }
+.branch-detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px clamp(24px, 5vw, 64px); align-items: start; }
+.branch-map.is-tall { height: clamp(260px, 40vw, 420px); }
+.branch-info .branch-addr { margin-top: 16px; font-size: 17px; line-height: 1.55; }
+.branch-ref { margin-top: 8px; color: var(--texto); line-height: 1.55; }
+.info-title { margin-top: 26px; font: 600 12px/1.2 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+.branch-info .hours { margin-top: 8px; }
+.branch-contact { margin-top: 10px; font-size: 17px; }
+.branch-contact a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: 3px; }
+.branch-info .btn { margin-top: 16px; }
+.service-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--teal); font-weight: 600; text-underline-offset: 3px; }
+.prose { flex: 2 1 460px; min-width: 0; max-width: 720px; }
+.prose p { font-size: 17px; line-height: 1.65; color: var(--texto); }
+.prose p + p { margin-top: 14px; }
+.checklist { flex: 2 1 460px; min-width: 0; padding: 4px clamp(16px, 3vw, 28px); }
+.checklist li { padding: 16px 0 16px 30px; position: relative; line-height: 1.5; }
+.checklist li + li { border-top: 1px solid var(--raya); }
+.checklist li::before { content: ""; position: absolute; left: 0; top: 22px; width: 12px; height: 12px; border-radius: 50%; background: var(--turquesa); border: 1.5px solid var(--marino); }
+.review-cta { padding: clamp(20px, 4vw, 36px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+.review-cta .lead { margin-top: 10px; }
+.links-404 { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.links-404 a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: 3px; }
+.page-404 { padding-bottom: var(--sec); }
+.draft-banner { padding: 12px var(--gutter); background: #fff4c2; border-bottom: 1px solid #e0c968; color: var(--marino); font-size: 15px; line-height: 1.45; text-align: center; }

@@ -1,0 +1,26 @@
+{
+  "masaya": {
+    "direccion": "Centro de Multiespecialidades Médicas, del cuerpo de bomberos 40 m al sur",
+    "localidad": "Masaya",
+    "departamento": "Masaya",
+    "como_llegar": "",
+    "mapa": "Opto Service, Cuerpo de bomberos 40 metros sur, Avenida central, Masaya, Nicaragua",
+    "lunes_viernes": { "abre": "08:30", "cierra": "17:00" },
+    "sabado": { "abre": "08:30", "cierra": "15:00" },
+    "latitud": "",
+    "longitud": "",
+    "resenas": ""
+  },
+  "diriomo": {
+    "direccion": "Plaza Candelaria, Módulo 7",
+    "localidad": "Diriomo",
+    "departamento": "Granada",
+    "como_llegar": "",
+    "mapa": "Opto Service Diriomo, Plaza Candelaria, Diriomo, Nicaragua",
+    "lunes_viernes": { "abre": "08:30", "cierra": "17:00" },
+    "sabado": { "abre": "08:00", "cierra": "14:00" },
+    "latitud": "",
+    "longitud": "",
+    "resenas": ""
+  }
+}

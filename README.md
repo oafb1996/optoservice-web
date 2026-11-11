@@ -2,7 +2,7 @@
 
 Sitio web de **Opto Service** — https://optoservicenic.com (Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua).
 
-Sitio estático de una sola página (HTML + CSS + JavaScript sin dependencias), con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos y las promociones se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
+Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio más una página por sucursal (`/masaya`, `/diriomo`), `/terapia-visual` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos y las promociones se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
 
 ## Administrar fotos y promociones (gerencia)
 
@@ -23,7 +23,12 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 ## Estructura
 
 ```
-index.html                  Página (con marcadores donde se insertan fotos y promociones)
+index.html                  Página de inicio (con marcadores donde se insertan fotos, promociones, sucursales y equipo)
+paginas/_sucursal.html      Plantilla de /masaya y /diriomo (los datos salen de content/sucursales.json)
+paginas/*.html              Otras páginas (terapia-visual, 404); toman encabezado y pie de index.html
+content/sucursales.json     Dirección, horario, coordenadas y enlace de reseñas de cada sucursal  ← Pages CMS
+content/equipo.json         Equipo de la sección Nosotros     ← lo edita Pages CMS
+robots.txt                  Indica a Google dónde está el sitemap
 content/fotos-*.json        Fotos de cada sección (portada, examen, nosotros, sucursales)  ← lo edita Pages CMS
 content/promociones.json    Promociones del mes              ← lo edita Pages CMS
 assets/uploads/             Fotos subidas desde el panel
@@ -31,9 +36,9 @@ assets/css/styles.css       Estilos
 assets/js/main.js           Menú móvil, "Agendar cita" en 3 pasos, FAQ, formulario, carruseles
 assets/img/                 Logo e imagen para compartir en redes
 assets/fonts/               Fuente Schibsted Grotesk (autoalojada, licencia SIL OFL)
-scripts/build.py            Genera el sitio publicable en _site/ (y vista-previa.html)
+scripts/build.py            Genera el sitio publicable en _site/ (todas las páginas, sitemap.xml y vista-previa.html)
 scripts/chat-mock.py        Simulador del canal web del asistente (para desarrollo y pruebas)
-docs/                       Contrato del chat web y borrador de política de privacidad (no se publican)
+docs/                       Contrato del chat web, borrador de política de privacidad y textos médicos por revisar (no se publican)
 content/chat.json           Interruptor y datos del asistente de chat       ← lo edita quien programa
 assets/js/chat.js           Panel del asistente (se descarga solo al abrirlo)
 assets/css/chat.css         Estilos del panel del asistente
@@ -41,6 +46,14 @@ assets/css/chat.css         Estilos del panel del asistente
 .github/workflows/          Publicación automática en GitHub Pages
 MEJORAS.md                  Checklist de mejoras pendientes
 ```
+
+## Páginas y SEO
+
+- **Encabezado, pie, botones flotantes y la hoja de "Agendar cita"** se escriben una sola vez en `index.html` (entre `<!--comun:...-->`) y `scripts/build.py` los copia a las demás páginas, con los enlaces ajustados (`#servicios` → `/#servicios`).
+- **Sucursales**: la dirección y el horario se editan en Pages CMS (*Sucursales*) y se actualizan en el inicio, en la página de cada sucursal, en el pie y en los datos estructurados para Google (JSON-LD `Optician`). Si se agrega el enlace de reseñas, aparece el botón "Déjanos tu reseña en Google".
+- **Borradores**: una página de `paginas/` con `<meta name="borrador" content="...">` se publica con `noindex` y un aviso, fuera del sitemap, y se quitan los enlaces que la apuntan (`data-requiere="<página>"`). Los textos médicos pendientes están en `docs/revision-medica.md`.
+- **URLs**: GitHub Pages sirve `masaya.html` como `/masaya`. Los enlaces y el canonical usan siempre la versión sin `.html`.
+- **`sitemap.xml`** se genera con las páginas publicadas; la fecha es la del último commit.
 
 ## Agendar cita
 
