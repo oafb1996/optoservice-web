@@ -262,6 +262,7 @@ a.photo-badge:focus-visible { outline: 2px solid var(--marino); outline-offset: 
 .hours dt { color: var(--suave); }
 .hours dd { font-weight: 600; }
 .branch .btn { margin-top: 12px; }
+.branch-actions { display: flex; flex-wrap: wrap; gap: 0 12px; }
 
 /* ===== Preguntas frecuentes ===== */
 .faq { padding-bottom: var(--sec); }

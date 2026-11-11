@@ -87,8 +87,9 @@ Después de publicar, verificar el dominio en Google Search Console, enviar
 también los datos estructurados en `https://validator.schema.org/`.
 Esto facilita el rastreo; no garantiza indexación ni posiciones.
 
-Pendientes fuera del código: reclamar/verificar los perfiles de Google de cada
-sucursal, confirmar sus pines, subir fotos reales y obtener sus enlaces de reseñas.
+El botón de reseñas de Masaya ya está incorporado en su tarjeta.
+Pendientes fuera del código: completar la reclamación del perfil de Diriomo y
+obtener su enlace de reseñas; confirmar los pines, datos y fotos de ambos perfiles.
 Pueden enlazar al inicio o al anclaje de su sede. No hace falta crear páginas de
 sucursal para completar esos pasos. No se agregó analítica: requiere definir la
 medición, configurar la propiedad y revisar la política de privacidad primero.
