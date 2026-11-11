@@ -100,7 +100,7 @@ content:
                 - { value: "#sucursales", label: "Ir a la sección Sucursales" }
                 - { value: "#promociones", label: "Ir a la sección Promociones" }
                 - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
-                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "/empresas", label: "Ir a la página Para empresas" }
                 - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
@@ -188,7 +188,7 @@ content:
                 - { value: "#sucursales", label: "Ir a la sección Sucursales" }
                 - { value: "#promociones", label: "Ir a la sección Promociones" }
                 - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
-                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "/empresas", label: "Ir a la página Para empresas" }
                 - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
@@ -276,7 +276,7 @@ content:
                 - { value: "#sucursales", label: "Ir a la sección Sucursales" }
                 - { value: "#promociones", label: "Ir a la sección Promociones" }
                 - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
-                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "/empresas", label: "Ir a la página Para empresas" }
                 - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
