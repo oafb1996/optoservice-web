@@ -1,0 +1,10 @@
+{
+  "segundos": 5,
+  "fotos": [
+    {
+      "imagen": "/assets/uploads/servicios-floral-kids.jpg",
+      "descripcion": "Montura Floral Kids disponible en Opto Service",
+      "enfoque": "centro"
+    }
+  ]
+}

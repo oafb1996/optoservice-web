@@ -9,7 +9,12 @@ Sitio estático de una sola página (HTML + CSS + JavaScript sin dependencias), 
 Panel: **https://app.pagescms.org** → repositorio `optoservice-web`.
 
 - **Promociones del mes**: imagen o flyer, título, precio u oferta, descripción, fecha de vencimiento y mensaje de WhatsApp. Las vencidas desaparecen solas. Si no hay ninguna vigente, la sección y el enlace del menú no se muestran.
-- **Fotos de la página**: una lista de fotos para cada espacio (portada, examen, nosotros). Si un espacio tiene más de una, rotan en carrusel (la portada muestra unas líneas debajo de la foto para cambiarla). También se elige cada cuántos segundos cambian.
+- **Fotos** (una opción por sección: *Fotos · Portada*, *Examen visual*, *Nosotros* y *Sucursales*): si una sección tiene más de una foto, rotan en carrusel, y cada sección tiene su propia velocidad. Cada foto puede llevar:
+  - un **recuadro de texto** (etiqueta + texto) que cambia junto con la foto, por ejemplo "Terapia visual" en la portada;
+  - la **parte que siempre debe verse** (9 posiciones: arriba a la izquierda, arriba, centro, abajo a la derecha, etc.);
+  - **cómo llenar el espacio**: *llenar* (recorta los bordes) o *mostrar completa* (sin recortar, con margen color lino).
+  Las fotos de sucursales son opcionales: si no hay, solo se ve el mapa.
+- **Vista previa de fotos**: https://optoservicenic.com/vista-previa.html muestra cada foto recortada tal como se verá en celular, tablet y computadora. Se actualiza en cada publicación, no está enlazada desde la página y Google no la indexa.
 
 Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir tal como salen del celular: se reducen y convierten a WebP automáticamente.
 
@@ -17,14 +22,14 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 
 ```
 index.html                  Página (con marcadores donde se insertan fotos y promociones)
-content/fotos.json          Fotos de cada carrusel           ← lo edita Pages CMS
+content/fotos-*.json        Fotos de cada sección (portada, examen, nosotros, sucursales)  ← lo edita Pages CMS
 content/promociones.json    Promociones del mes              ← lo edita Pages CMS
 assets/uploads/             Fotos subidas desde el panel
 assets/css/styles.css       Estilos
 assets/js/main.js           Menú móvil, "Agendar cita" en 3 pasos, FAQ, formulario, carruseles
 assets/img/                 Logo e imagen para compartir en redes
 assets/fonts/               Fuente Schibsted Grotesk (autoalojada, licencia SIL OFL)
-scripts/build.py            Genera el sitio publicable en _site/
+scripts/build.py            Genera el sitio publicable en _site/ (y vista-previa.html)
 scripts/chat-mock.py        Simulador del canal web del asistente (para desarrollo y pruebas)
 docs/                       Contrato del chat web y borrador de política de privacidad (no se publican)
 content/chat.json           Interruptor y datos del asistente de chat       ← lo edita quien programa

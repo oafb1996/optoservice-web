@@ -5,7 +5,8 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 ## Nuevas funciones
 
 - [x] **Promociones del mes**: sección propia, administrable desde Pages CMS, con fecha de vencimiento (se ocultan solas) y botón de WhatsApp por promoción.
-- [x] **Carruseles de fotos** en portada, examen y nosotros, administrables desde Pages CMS.
+- [x] **Carruseles de fotos** en portada, examen, nosotros y sucursales, cada sección con su propia opción en Pages CMS.
+- [x] **Recuadro de texto por foto** (antes "Terapia visual" salía en todas), **encuadre de 9 posiciones**, opción **mostrar completa** y **vista previa de recortes** (`/vista-previa.html`).
 - [x] **Nuevo diseño (propuesta B, "Farmacia de lino")**: fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk.
 - [x] **Agendar cita en 3 pasos** (servicio, sucursal, cuándo): arma el mensaje de WhatsApp.
 - [x] **Optimización automática de imágenes** subidas desde el panel (WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.

@@ -207,7 +207,9 @@
   }
 
   // ===== Carruseles de fotos: cambian solos mientras están a la vista =====
-  function loadSlide(img) {
+  function loadSlide(slide) {
+    var img = slide.tagName === 'IMG' ? slide : slide.querySelector('img');
+    if (!img) return;
     if (img.dataset.srcset) { img.srcset = img.dataset.srcset; delete img.dataset.srcset; }
     if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
   }
