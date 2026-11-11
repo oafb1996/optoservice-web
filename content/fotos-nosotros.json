@@ -1,0 +1,10 @@
+{
+  "segundos": 5,
+  "fotos": [
+    {
+      "imagen": "/assets/uploads/portada-paciente.jpg",
+      "descripcion": "Paciente con lentes en Opto Service",
+      "enfoque": "arriba"
+    }
+  ]
+}

@@ -2,10 +2,12 @@
 """Genera el sitio publicable en _site/.
 
 1. Copia los archivos del sitio.
-2. Inserta en index.html las fotos de content/fotos.json y las promociones de
-   content/promociones.json (ambos se editan desde Pages CMS).
+2. Inserta en index.html las fotos de content/fotos-*.json y las promociones de
+   content/promociones.json (todo se edita desde Pages CMS).
 3. Optimiza cada imagen usada: versiones WebP de 480, 800 y 1200 px de ancho y
    un JPEG (o PNG) de respaldo, para que las fotos del celular no pesen.
+4. Genera vista-previa.html: cada foto recortada como se verá en celular,
+   tablet y computadora (no se enlaza desde la página ni la indexa Google).
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -38,16 +40,38 @@ NICARAGUA = timezone(timedelta(hours=-6))
 MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
          'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
-# Espacios de foto: ancho mostrado (atributo sizes), encuadre y texto alternativo por defecto
+# Espacios de foto. Cada uno se edita en Pages CMS desde su propio archivo de content/.
+#   sizes: ancho mostrado (atributo sizes)   pos: encuadre por defecto   alt: texto alternativo por defecto
+#   opcional: si no tiene fotos, el espacio no se muestra (en vez de dejar la foto por defecto)
+#   marcos: tamaño real del espacio (ancho, alto) en celular, tablet y computadora, para vista-previa.html
 SLOTS = {
-    'portada': {'sizes': '(max-width: 899px) calc(100vw - 32px), 590px', 'pos': '50% 30%',
-                'alt': 'Paciente con lentes en Opto Service'},
-    'examen': {'sizes': '(max-width: 899px) calc(100vw - 34px), 510px', 'pos': '50% 55%',
-               'alt': 'Lentes disponibles en Opto Service'},
-    'nosotros': {'sizes': '(max-width: 899px) calc(100vw - 32px), 480px', 'pos': '50% 30%',
-                 'alt': 'Paciente de Opto Service'},
+    'portada': {'archivo': 'fotos-portada.json', 'lista': 'fotos', 'titulo': 'Portada',
+                'sizes': '(max-width: 899px) calc(100vw - 32px), 590px', 'pos': '50% 30%',
+                'alt': 'Paciente con lentes en Opto Service',
+                'marcos': {'Celular': (358, 448), 'Tablet': (707, 640), 'Computadora': (548, 640)}},
+    'examen': {'archivo': 'fotos-examen.json', 'lista': 'fotos', 'titulo': 'Examen visual',
+               'sizes': '(max-width: 999px) calc(100vw - 34px), 510px', 'pos': '50% 55%',
+               'alt': 'Lentes disponibles en Opto Service',
+               'marcos': {'Celular': (356, 267), 'Tablet': (705, 529), 'Computadora': (534, 726)}},
+    'nosotros': {'archivo': 'fotos-nosotros.json', 'lista': 'fotos', 'titulo': 'Nosotros',
+                 'sizes': '(max-width: 999px) calc(100vw - 32px), 480px', 'pos': '50% 30%',
+                 'alt': 'Paciente de Opto Service',
+                 'marcos': {'Celular': (358, 448), 'Tablet': (707, 560), 'Computadora': (477, 540)}},
+    'masaya': {'archivo': 'fotos-sucursales.json', 'lista': 'masaya', 'titulo': 'Sucursal Masaya',
+               'sizes': '(max-width: 767px) calc(100vw - 34px), 600px', 'pos': '50% 50%',
+               'alt': 'Sucursal de Opto Service en Masaya', 'opcional': True,
+               'marcos': {'Celular': (356, 223), 'Tablet': (343, 215), 'Computadora': (590, 369)}},
+    'diriomo': {'archivo': 'fotos-sucursales.json', 'lista': 'diriomo', 'titulo': 'Sucursal Diriomo',
+                'sizes': '(max-width: 767px) calc(100vw - 34px), 600px', 'pos': '50% 50%',
+                'alt': 'Sucursal de Opto Service en Diriomo', 'opcional': True,
+                'marcos': {'Celular': (356, 223), 'Tablet': (343, 215), 'Computadora': (590, 369)}},
 }
-ENFOQUE = {'arriba': '50% 22%', 'centro': '50% 50%', 'abajo': '50% 80%'}
+# Parte de la foto que siempre debe verse (campo "enfoque" del panel)
+ENFOQUE = {
+    'arriba-izquierda': '15% 20%', 'arriba': '50% 20%', 'arriba-derecha': '85% 20%',
+    'izquierda': '15% 50%', 'centro': '50% 50%', 'derecha': '85% 50%',
+    'abajo-izquierda': '15% 80%', 'abajo': '50% 80%', 'abajo-derecha': '85% 80%',
+}
 PROMO_SIZES = '(max-width: 599px) calc(100vw - 32px), 300px'
 WA_GENERAL = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quiero agendar un examen visual. ¿Me ayudan con la cita?', safe='')
 WA_CHAT = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quisiera hablar con una persona del equipo.', safe='')
@@ -151,7 +175,8 @@ def replace_block(page, name, lines):
     return page[:match.start()] + f'{ind}<!--{name}-->\n{body}{ind}<!--/{name}-->' + page[match.end():]
 
 
-def render_slides(slot, items, optimize):
+def slide_items(slot, items, optimize):
+    """Fotos válidas de un espacio, con todo lo necesario para mostrarlas."""
     cfg = SLOTS[slot]
     out = []
     for item in items if isinstance(items, list) else []:
@@ -160,21 +185,103 @@ def render_slides(slot, items, optimize):
         img = optimize(item['imagen'])
         if not img:
             continue
-        first = not out
-        alt = text(item.get('descripcion')) or cfg['alt']
-        pos = ENFOQUE.get(text(item.get('enfoque')), cfg['pos'])
-        parts = ['<img class="slide is-active"' if first else '<img class="slide"']
+        enfoque = text(item.get('enfoque'))
+        if enfoque and enfoque not in ENFOQUE:
+            warn(f'enfoque "{enfoque}" no válido en {cfg["titulo"]}; se usa el encuadre por defecto')
+        out.append({
+            'img': img,
+            'alt': text(item.get('descripcion')) or cfg['alt'],
+            'pos': ENFOQUE.get(enfoque, cfg['pos']),
+            'completa': text(item.get('ajuste')) == 'completa',
+            'etiqueta': text(item.get('etiqueta')),
+            'texto': text(item.get('texto')),
+        })
+    return out
+
+
+def badge_html(item):
+    if not item['etiqueta'] and not item['texto']:
+        return ''
+    parts = ['<div class="photo-badge">']
+    if item['etiqueta']:
+        parts.append(f'<div class="eyebrow">{html.escape(item["etiqueta"])}</div>')
+    if item['texto']:
+        parts.append(f'<div class="photo-badge-text">{html.escape(item["texto"])}</div>')
+    parts.append('</div>')
+    return ''.join(parts)
+
+
+def render_slides(slot, items):
+    cfg = SLOTS[slot]
+    out = []
+    for i, item in enumerate(items):
+        first = i == 0
+        img = item['img']
+        cls = 'slide' + (' is-active' if first else '') + (' is-full' if item['completa'] else '')
+        parts = ['<img']
         if first:
             parts.append(f'src="{attr(img["src"])}" srcset="{attr(img["srcset"])}"')
         else:  # se cargan cuando el carrusel llega a ellas
             parts.append(f'data-src="{attr(img["src"])}" data-srcset="{attr(img["srcset"])}"')
         parts.append(f'sizes="{cfg["sizes"]}" width="{img["width"]}" height="{img["height"]}"')
-        parts.append(f'alt="{attr(alt)}" style="object-position:{pos}"')
+        parts.append(f'alt="{attr(item["alt"])}" style="object-position:{item["pos"]}"')
         if first:
             parts.append('fetchpriority="high"' if slot == 'portada' else 'loading="lazy"')
         parts.append('decoding="async">')
-        out.append(' '.join(parts))
+        out.append(f'<div class="{cls}">' + ' '.join(parts) + badge_html(item) + '</div>')
     return out
+
+
+def render_preview(fotos, today):
+    """vista-previa.html: cada foto recortada en el tamaño real de su espacio."""
+    css = (
+        "body{margin:0;padding:24px 16px 64px;background:#f2ede8;color:#14213d;font:16px/1.5 'Schibsted Grotesk',system-ui,sans-serif}"
+        ".pv-wrap{max-width:1400px;margin:0 auto}h1{font-size:32px;line-height:1.1;letter-spacing:-.03em;margin:0}"
+        "h2{margin:48px 0 4px;font-size:24px;letter-spacing:-.02em}.pv-note{color:#3a4254;max-width:760px;margin:12px 0 0}"
+        ".pv-photo{margin-top:20px;padding:16px;background:#fff;border:1px solid #ddd4c9;border-radius:10px}"
+        ".pv-meta{font-size:14px;color:#565c6b;margin-bottom:12px}.pv-meta b{color:#14213d}"
+        ".pv-frames{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}"
+        ".pv-frame figcaption{font:600 12px/1.2 'Schibsted Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#565c6b;margin-bottom:6px}"
+        ".pv-box{position:relative;overflow:hidden;border-radius:10px;background:#e5ddd3;outline:1px dashed #8a8f9c}"
+        ".pv-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}"
+        ".pv-box.is-full img{object-fit:contain;background:#f2ede8}.pv-empty{color:#565c6b;font-style:italic}"
+    )
+    out = ['<!DOCTYPE html>', '<html lang="es"><head><meta charset="utf-8">',
+           '<meta name="viewport" content="width=device-width, initial-scale=1">',
+           '<meta name="robots" content="noindex, nofollow">',
+           '<title>Vista previa de fotos — Opto Service</title>',
+           '<link rel="stylesheet" href="assets/css/styles.css">',
+           f'<style>{css}</style></head><body><div class="pv-wrap">',
+           '<h1>Vista previa de fotos</h1>',
+           '<p class="pv-note">Así se recorta cada foto en celular, tablet y computadora (a la mitad de su tamaño real). '
+           'Si una cara o un detalle importante queda cortado, cambia el campo <b>Parte de la foto que siempre debe verse</b> '
+           'en el panel, o elige <b>Mostrar completa</b> en <b>Cómo llenar el espacio</b>. '
+           f'Generada el {today.day} de {MESES[today.month - 1]} de {today.year}.</p>']
+    for slot, cfg in SLOTS.items():
+        items = fotos.get(slot) or []
+        out.append(f'<h2>{html.escape(cfg["titulo"])}</h2>')
+        if not items:
+            out.append('<p class="pv-empty">Sin fotos' + (': este espacio no se muestra en la página.' if cfg.get('opcional') else '.') + '</p>')
+            continue
+        for n, item in enumerate(items, 1):
+            img = item['img']
+            name = img['src'].rsplit('/', 1)[-1]
+            ajuste = 'mostrar completa' if item['completa'] else 'llenar el espacio'
+            out.append('<div class="pv-photo">')
+            out.append(f'<div class="pv-meta"><b>Foto {n}</b> · {html.escape(item["alt"])} · encuadre {item["pos"]} · {ajuste} · <code>{html.escape(name)}</code></div>')
+            out.append('<div class="pv-frames">')
+            for label, (w, h) in cfg['marcos'].items():
+                cls = 'pv-box is-full' if item['completa'] else 'pv-box'
+                out.append(f'<figure class="pv-frame" style="margin:0"><figcaption>{label} · {w}×{h}</figcaption>'
+                           f'<div class="{cls}" style="width:{w // 2}px;height:{h // 2}px">'
+                           f'<img src="{attr(img["src"])}" alt="" loading="lazy" style="object-position:{item["pos"]}">'
+                           f'</div></figure>')
+            out.append('</div>')
+            if item['etiqueta'] or item['texto']:
+                out.append(f'<div class="pv-meta" style="margin:12px 0 0">Recuadro sobre la foto: <b>{html.escape(item["etiqueta"])}</b> {html.escape(item["texto"])}</div>')
+            out.append('</div>')
+    out.append('</div></body></html>')
+    return '\n'.join(out) + '\n'
 
 
 def render_promos(items, optimize, today):
@@ -333,18 +440,24 @@ def main():
     optimize = Optimizer(out)
     page = (ROOT / 'index.html').read_text(encoding='utf-8')
 
-    fotos = load_json('fotos.json')
-    segundos = fotos.get('segundos')
-    if isinstance(segundos, bool) or not isinstance(segundos, (int, float)) or not math.isfinite(segundos):
-        segundos = 5
-    interval = int(min(max(segundos, 3), 20) * 1000)
-    page = re.sub(r'data-interval="\d+"', f'data-interval="{interval}"', page)
-    for slot in SLOTS:
-        slides = render_slides(slot, fotos.get(slot), optimize)
-        if slides:
-            page = replace_block(page, f'fotos:{slot}', slides)
+    fotos = {}
+    for slot, cfg in SLOTS.items():
+        data = load_json(cfg['archivo'])
+        items = slide_items(slot, data.get(cfg['lista']), optimize)
+        fotos[slot] = items
+        segundos = data.get('segundos')
+        if isinstance(segundos, bool) or not isinstance(segundos, (int, float)) or not math.isfinite(segundos):
+            segundos = 5
+        interval = int(min(max(segundos, 3), 20) * 1000)
+        page = re.sub(r'(data-carousel="%s" data-interval=")\d+"' % slot, r'\g<1>%d"' % interval, page)
+        if items:
+            page = replace_block(page, f'fotos:{slot}', render_slides(slot, items))
+            page = re.sub(r'(data-carousel="%s"[^>]*?) hidden>' % slot, r'\1>', page)
+        elif cfg.get('opcional'):
+            page = replace_block(page, f'fotos:{slot}', [])
         else:
-            warn(f'"{slot}" no tiene fotos válidas; se deja la foto por defecto')
+            warn(f'"{cfg["titulo"]}" no tiene fotos válidas; se deja la foto por defecto')
+    (out / 'vista-previa.html').write_text(render_preview(fotos, today), encoding='utf-8')
 
     cards = render_promos(load_json('promociones.json').get('promociones'), optimize, today)
     page = replace_block(page, 'promociones', cards)

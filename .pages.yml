@@ -46,22 +46,193 @@ content:
             type: string
             description: Opcional. Si lo dejas vacío se envía "Me interesa la promoción" con el título.
 
-  - name: fotos
-    label: Fotos de la página
+  - name: fotos-portada
+    label: "Fotos · Portada"
     type: file
-    path: content/fotos.json
+    path: content/fotos-portada.json
     format: json
     fields:
       - name: segundos
         label: Segundos entre fotos
         type: number
         default: 5
-        description: Cada cuánto cambia la foto en los carruseles (entre 3 y 20).
-      - name: portada
-        label: Portada (foto grande de arriba)
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+      - name: fotos
+        label: "Fotos de la portada"
         type: object
         list: true
-        description: Fotos verticales. Si hay más de una, rotan solas.
+        description: "La foto grande de arriba. Si hay más de una, rotan solas. Se ve vertical en celular y computadora, y horizontal en tablet: deja lo importante cerca del centro."
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: etiqueta
+            label: Etiqueta del recuadro
+            type: string
+            description: "Opcional. Texto corto en mayúsculas sobre la foto. Ej.: Terapia visual"
+          - name: texto
+            label: Texto del recuadro
+            type: string
+            description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            description: La foto se recorta distinto en celular y en computadora. Elige dónde está lo importante (por ejemplo, la cara). Revisa el resultado en optoservicenic.com/vista-previa.html
+            options:
+              values:
+                - { value: arriba-izquierda, label: Arriba a la izquierda }
+                - { value: arriba, label: Arriba (caras) }
+                - { value: arriba-derecha, label: Arriba a la derecha }
+                - { value: izquierda, label: Izquierda }
+                - { value: centro, label: Centro }
+                - { value: derecha, label: Derecha }
+                - { value: abajo-izquierda, label: Abajo a la izquierda }
+                - { value: abajo, label: Abajo }
+                - { value: abajo-derecha, label: Abajo a la derecha }
+          - name: ajuste
+            label: Cómo llenar el espacio
+            type: select
+            description: "Llenar: la foto cubre todo el espacio y se recortan los bordes. Mostrar completa: no se recorta nada y sobra un margen color lino (útil para fotos de producto o con texto)."
+            options:
+              values:
+                - { value: llenar, label: Llenar el espacio (recorta los bordes) }
+                - { value: completa, label: Mostrar completa (sin recortar) }
+
+  - name: fotos-examen
+    label: "Fotos · Examen visual"
+    type: file
+    path: content/fotos-examen.json
+    format: json
+    fields:
+      - name: segundos
+        label: Segundos entre fotos
+        type: number
+        default: 5
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+      - name: fotos
+        label: "Fotos del examen visual"
+        type: object
+        list: true
+        description: "Junto a la lista del examen. Se ve horizontal en celular y tablet, y vertical en computadora."
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: etiqueta
+            label: Etiqueta del recuadro
+            type: string
+            description: "Opcional. Texto corto en mayúsculas sobre la foto. Ej.: Terapia visual"
+          - name: texto
+            label: Texto del recuadro
+            type: string
+            description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            description: La foto se recorta distinto en celular y en computadora. Elige dónde está lo importante (por ejemplo, la cara). Revisa el resultado en optoservicenic.com/vista-previa.html
+            options:
+              values:
+                - { value: arriba-izquierda, label: Arriba a la izquierda }
+                - { value: arriba, label: Arriba (caras) }
+                - { value: arriba-derecha, label: Arriba a la derecha }
+                - { value: izquierda, label: Izquierda }
+                - { value: centro, label: Centro }
+                - { value: derecha, label: Derecha }
+                - { value: abajo-izquierda, label: Abajo a la izquierda }
+                - { value: abajo, label: Abajo }
+                - { value: abajo-derecha, label: Abajo a la derecha }
+          - name: ajuste
+            label: Cómo llenar el espacio
+            type: select
+            description: "Llenar: la foto cubre todo el espacio y se recortan los bordes. Mostrar completa: no se recorta nada y sobra un margen color lino (útil para fotos de producto o con texto)."
+            options:
+              values:
+                - { value: llenar, label: Llenar el espacio (recorta los bordes) }
+                - { value: completa, label: Mostrar completa (sin recortar) }
+
+  - name: fotos-nosotros
+    label: "Fotos · Nosotros"
+    type: file
+    path: content/fotos-nosotros.json
+    format: json
+    fields:
+      - name: segundos
+        label: Segundos entre fotos
+        type: number
+        default: 5
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+      - name: fotos
+        label: "Fotos de Nosotros"
+        type: object
+        list: true
+        description: "En la sección azul de Nuestra especialidad. Se ve vertical en celular y computadora."
+        fields:
+          - name: imagen
+            label: Foto
+            type: image
+            required: true
+          - name: descripcion
+            label: Descripción de la foto
+            type: string
+            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
+          - name: etiqueta
+            label: Etiqueta del recuadro
+            type: string
+            description: "Opcional. Texto corto en mayúsculas sobre la foto. Ej.: Terapia visual"
+          - name: texto
+            label: Texto del recuadro
+            type: string
+            description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enfoque
+            label: Parte de la foto que siempre debe verse
+            type: select
+            description: La foto se recorta distinto en celular y en computadora. Elige dónde está lo importante (por ejemplo, la cara). Revisa el resultado en optoservicenic.com/vista-previa.html
+            options:
+              values:
+                - { value: arriba-izquierda, label: Arriba a la izquierda }
+                - { value: arriba, label: Arriba (caras) }
+                - { value: arriba-derecha, label: Arriba a la derecha }
+                - { value: izquierda, label: Izquierda }
+                - { value: centro, label: Centro }
+                - { value: derecha, label: Derecha }
+                - { value: abajo-izquierda, label: Abajo a la izquierda }
+                - { value: abajo, label: Abajo }
+                - { value: abajo-derecha, label: Abajo a la derecha }
+          - name: ajuste
+            label: Cómo llenar el espacio
+            type: select
+            description: "Llenar: la foto cubre todo el espacio y se recortan los bordes. Mostrar completa: no se recorta nada y sobra un margen color lino (útil para fotos de producto o con texto)."
+            options:
+              values:
+                - { value: llenar, label: Llenar el espacio (recorta los bordes) }
+                - { value: completa, label: Mostrar completa (sin recortar) }
+
+  - name: fotos-sucursales
+    label: "Fotos · Sucursales"
+    type: file
+    path: content/fotos-sucursales.json
+    format: json
+    fields:
+      - name: segundos
+        label: Segundos entre fotos
+        type: number
+        default: 5
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+      - name: masaya
+        label: "Fotos de la sucursal de Masaya"
+        type: object
+        list: true
+        description: "Opcional: fachada o interior. Se ven horizontales encima del mapa. Si no hay fotos, solo se muestra el mapa."
         fields:
           - name: imagen
             label: Foto
@@ -74,15 +245,31 @@ content:
           - name: enfoque
             label: Parte de la foto que siempre debe verse
             type: select
+            description: La foto se recorta distinto en celular y en computadora. Elige dónde está lo importante (por ejemplo, la cara). Revisa el resultado en optoservicenic.com/vista-previa.html
             options:
               values:
+                - { value: arriba-izquierda, label: Arriba a la izquierda }
                 - { value: arriba, label: Arriba (caras) }
+                - { value: arriba-derecha, label: Arriba a la derecha }
+                - { value: izquierda, label: Izquierda }
                 - { value: centro, label: Centro }
+                - { value: derecha, label: Derecha }
+                - { value: abajo-izquierda, label: Abajo a la izquierda }
                 - { value: abajo, label: Abajo }
-      - name: examen
-        label: Examen visual (foto junto a la lista del examen)
+                - { value: abajo-derecha, label: Abajo a la derecha }
+          - name: ajuste
+            label: Cómo llenar el espacio
+            type: select
+            description: "Llenar: la foto cubre todo el espacio y se recortan los bordes. Mostrar completa: no se recorta nada y sobra un margen color lino (útil para fotos de producto o con texto)."
+            options:
+              values:
+                - { value: llenar, label: Llenar el espacio (recorta los bordes) }
+                - { value: completa, label: Mostrar completa (sin recortar) }
+      - name: diriomo
+        label: "Fotos de la sucursal de Diriomo"
         type: object
         list: true
+        description: "Opcional: fachada o interior. Se ven horizontales encima del mapa. Si no hay fotos, solo se muestra el mapa."
         fields:
           - name: imagen
             label: Foto
@@ -95,29 +282,23 @@ content:
           - name: enfoque
             label: Parte de la foto que siempre debe verse
             type: select
+            description: La foto se recorta distinto en celular y en computadora. Elige dónde está lo importante (por ejemplo, la cara). Revisa el resultado en optoservicenic.com/vista-previa.html
             options:
               values:
+                - { value: arriba-izquierda, label: Arriba a la izquierda }
                 - { value: arriba, label: Arriba (caras) }
+                - { value: arriba-derecha, label: Arriba a la derecha }
+                - { value: izquierda, label: Izquierda }
                 - { value: centro, label: Centro }
+                - { value: derecha, label: Derecha }
+                - { value: abajo-izquierda, label: Abajo a la izquierda }
                 - { value: abajo, label: Abajo }
-      - name: nosotros
-        label: Nosotros (foto vertical, sección azul)
-        type: object
-        list: true
-        fields:
-          - name: imagen
-            label: Foto
-            type: image
-            required: true
-          - name: descripcion
-            label: Descripción de la foto
-            type: string
-            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
-          - name: enfoque
-            label: Parte de la foto que siempre debe verse
+                - { value: abajo-derecha, label: Abajo a la derecha }
+          - name: ajuste
+            label: Cómo llenar el espacio
             type: select
+            description: "Llenar: la foto cubre todo el espacio y se recortan los bordes. Mostrar completa: no se recorta nada y sobra un margen color lino (útil para fotos de producto o con texto)."
             options:
               values:
-                - { value: arriba, label: Arriba (caras) }
-                - { value: centro, label: Centro }
-                - { value: abajo, label: Abajo }
+                - { value: llenar, label: Llenar el espacio (recorta los bordes) }
+                - { value: completa, label: Mostrar completa (sin recortar) }

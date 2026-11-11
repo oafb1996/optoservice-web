@@ -1,0 +1,33 @@
+{
+  "segundos": 5,
+  "fotos": [
+    {
+      "imagen": "/assets/uploads/portada-paciente.jpg",
+      "descripcion": "Paciente con lentes en Opto Service",
+      "enfoque": "arriba",
+      "etiqueta": "Terapia visual",
+      "texto": "Ortóptica para estrabismo, ambliopía y convergencia"
+    },
+    {
+      "imagen": "/assets/uploads/examen-nina.jpg",
+      "descripcion": "Niña sonriendo con lentes nuevos",
+      "enfoque": "arriba",
+      "etiqueta": "Optometría pediátrica",
+      "texto": "Evaluación visual para niñas y niños, adaptada a cada edad"
+    },
+    {
+      "imagen": "/assets/uploads/nosotros-nino.jpg",
+      "descripcion": "Niño con lentes Floral Kids en Opto Service",
+      "enfoque": "arriba",
+      "etiqueta": "Toda la familia",
+      "texto": "De los primeros mesecitos a la edad dorada"
+    },
+    {
+      "imagen": "/assets/uploads/servicios-floral-kids.jpg",
+      "descripcion": "Montura Floral Kids disponible en Opto Service",
+      "enfoque": "centro",
+      "etiqueta": "Lentes oftálmicos",
+      "texto": "Monturas y lentes graduados a tu medida"
+    }
+  ]
+}
