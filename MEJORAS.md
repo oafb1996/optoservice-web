@@ -7,9 +7,13 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] **Promociones del mes**: sección propia, administrable desde Pages CMS, con fecha de vencimiento (se ocultan solas) y botón de WhatsApp por promoción.
 - [x] **Carruseles de fotos** en portada, examen, nosotros y sucursales, cada sección con su propia opción en Pages CMS.
 - [x] **Recuadro de texto por foto** (antes "Terapia visual" salía en todas), **encuadre de 9 posiciones**, opción **mostrar completa** y **vista previa de recortes** (`/vista-previa.html`).
+- [x] **Avisos y promociones en la vista previa**: fotos borrosas, sin descripción, muy recortadas o sin usar; promociones vigentes, vencidas y ocultas.
+- [x] **Fechas por foto** (mostrar desde / hasta) y **enlace en el recuadro** (agendar con servicio elegido o ir a una sección).
+- [x] **Carruseles accesibles**: botón de pausa, se detienen con el mouse o el teclado encima, flechas para cambiar de foto.
+- [x] **Fotos en AVIF** (además de WebP): unos 30 % más livianas.
 - [x] **Nuevo diseño (propuesta B, "Farmacia de lino")**: fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk.
 - [x] **Agendar cita en 3 pasos** (servicio, sucursal, cuándo): arma el mensaje de WhatsApp.
-- [x] **Optimización automática de imágenes** subidas desde el panel (WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.
+- [x] **Optimización automática de imágenes** subidas desde el panel (AVIF y WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.
 - [x] Pages CMS conectado: administración y gerencia suben fotos y promociones desde el panel.
 - [ ] **Asistente de chat en la web** (chatbot de osops): widget listo y apagado; falta el backend. Ver la sección del final.
 

@@ -1,2 +1,2 @@
-Pillow>=11,<13
+Pillow>=11.3,<13  # 11.3+ trae soporte AVIF
 pillow-heif>=0.18,<2

@@ -4,10 +4,12 @@
 1. Copia los archivos del sitio.
 2. Inserta en index.html las fotos de content/fotos-*.json y las promociones de
    content/promociones.json (todo se edita desde Pages CMS).
-3. Optimiza cada imagen usada: versiones WebP de 480, 800 y 1200 px de ancho y
-   un JPEG (o PNG) de respaldo, para que las fotos del celular no pesen.
-4. Genera vista-previa.html: cada foto recortada como se verá en celular,
-   tablet y computadora (no se enlaza desde la página ni la indexa Google).
+3. Optimiza cada imagen usada: versiones AVIF y WebP de 480, 800 y 1200 px de
+   ancho y un JPEG (o PNG) de respaldo, para que las fotos del celular no pesen.
+4. Genera vista-previa.html: avisos (fotos borrosas, sin descripción, muy
+   recortadas o sin usar), las promociones con su estado y cada foto recortada
+   como se verá en celular, tablet y computadora (no se enlaza desde la página
+   ni la indexa Google).
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -24,7 +26,7 @@ import urllib.parse
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, features
 
 try:  # fotos HEIC de iPhone
     from pillow_heif import register_heif_opener
@@ -72,6 +74,16 @@ ENFOQUE = {
     'izquierda': '15% 50%', 'centro': '50% 50%', 'derecha': '85% 50%',
     'abajo-izquierda': '15% 80%', 'abajo': '50% 80%', 'abajo-derecha': '85% 80%',
 }
+AVIF = features.check('avif')
+# Servicios que se pueden dejar elegidos al abrir "Agendar cita" (deben coincidir con index.html)
+SERVICIOS = ['Examen visual completo', 'Terapia visual', 'Optometría pediátrica', 'Lentes oftálmicos',
+             'Lentes de contacto', 'Atención oftalmológica']
+# Secciones a las que puede llevar el recuadro de una foto (campo "enlace")
+SECCIONES = {'#promociones': 'Promociones', '#servicios': 'Servicios', '#examen': 'Examen visual',
+             '#nosotros': 'Nosotros', '#senales': '¿Cuándo revisarte?', '#sucursales': 'Sucursales',
+             '#faq': 'Preguntas frecuentes', '#empresas': 'Para empresas', '#contacto': 'Contacto'}
+MIN_ANCHO = 1000  # px: con menos, la foto puede verse borrosa en computadora
+MIN_VISIBLE = .5  # fracción de la foto que debe verse en cada pantalla antes de avisar
 PROMO_SIZES = '(max-width: 599px) calc(100vw - 32px), 300px'
 WA_GENERAL = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quiero agendar un examen visual. ¿Me ayudan con la cita?', safe='')
 WA_CHAT = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quisiera hablar con una persona del equipo.', safe='')
@@ -147,11 +159,16 @@ class Optimizer:
         w, h = im.size
         base = f'{slug(src.stem)}-{hashlib.sha1(src.read_bytes()).hexdigest()[:8]}'
 
-        srcset = []
+        srcset, avif = [], []
         for tw in sorted({min(t, w) for t in WIDTHS}):
+            resized = im.resize((tw, round(h * tw / w)), Image.LANCZOS)
             name = f'{base}-{tw}.webp'
-            im.resize((tw, round(h * tw / w)), Image.LANCZOS).save(self.dir / name, 'WEBP', quality=78, method=5)
+            resized.save(self.dir / name, 'WEBP', quality=78, method=5)
             srcset.append(f'assets/opt/{name} {tw}w')
+            if AVIF:  # entre 20 y 30 % más liviano que WebP con la misma calidad
+                name = f'{base}-{tw}.avif'
+                resized.save(self.dir / name, 'AVIF', quality=50, speed=6)
+                avif.append(f'assets/opt/{name} {tw}w')
 
         fw = min(WIDTHS[-1], w)
         fh = round(h * fw / w)
@@ -162,7 +179,16 @@ class Optimizer:
         else:
             name = f'{base}.jpg'
             fallback.save(self.dir / name, 'JPEG', quality=80, optimize=True, progressive=True)
-        return {'src': f'assets/opt/{name}', 'srcset': ', '.join(srcset), 'width': fw, 'height': fh}
+        return {'src': f'assets/opt/{name}', 'srcset': ', '.join(srcset), 'avif': ', '.join(avif),
+                'width': fw, 'height': fh, 'orig_w': w, 'orig_h': h, 'rel': rel}
+
+
+def picture(img, sizes, attrs, lazy=False):
+    """<picture> con AVIF (si se generó) y WebP; lazy=True deja las direcciones en data-* para cargarlas después."""
+    pre = 'data-' if lazy else ''
+    source = (f'<source type="image/avif" {pre}srcset="{attr(img["avif"])}" sizes="{sizes}">' if img.get('avif') else '')
+    return (f'<picture>{source}<img {pre}src="{attr(img["src"])}" {pre}srcset="{attr(img["srcset"])}" sizes="{sizes}" '
+            f'width="{img["width"]}" height="{img["height"]}" {attrs}></picture>')
 
 
 def replace_block(page, name, lines):
@@ -175,40 +201,79 @@ def replace_block(page, name, lines):
     return page[:match.start()] + f'{ind}<!--{name}-->\n{body}{ind}<!--/{name}-->' + page[match.end():]
 
 
-def slide_items(slot, items, optimize):
-    """Fotos válidas de un espacio, con todo lo necesario para mostrarlas."""
+def slide_items(slot, items, optimize, today):
+    """Fotos de un espacio con todo lo necesario para mostrarlas.
+
+    Devuelve todas las fotos válidas; las que están fuera de sus fechas llevan 'estado' para
+    que la vista previa las liste, pero no se muestran en la página.
+    """
     cfg = SLOTS[slot]
     out = []
-    for item in items if isinstance(items, list) else []:
+    for n, item in enumerate(items if isinstance(items, list) else [], 1):
         if not isinstance(item, dict) or not text(item.get('imagen')):
             continue
         img = optimize(item['imagen'])
         if not img:
             continue
+        where = f'{cfg["titulo"]}, foto {n}'
         enfoque = text(item.get('enfoque'))
         if enfoque and enfoque not in ENFOQUE:
-            warn(f'enfoque "{enfoque}" no válido en {cfg["titulo"]}; se usa el encuadre por defecto')
+            warn(f'enfoque "{enfoque}" no válido en {where}; se usa el encuadre por defecto')
+        desde = parse_date(item.get('desde'), where)
+        hasta = parse_date(item.get('hasta'), where)
+        estado = ''
+        if desde and today < desde:
+            estado = f'programada: se muestra desde el {fecha(desde)}'
+        elif hasta and today > hasta:
+            estado = f'vencida: se dejó de mostrar después del {fecha(hasta)}'
+        enlace = text(item.get('enlace'))
+        if enlace and not (enlace in SECCIONES or enlace == 'agendar'
+                           or (enlace.startswith('agendar:') and enlace[8:] in SERVICIOS)):
+            warn(f'enlace "{enlace}" no válido en {where}; el recuadro queda sin enlace')
+            enlace = ''
         out.append({
-            'img': img,
+            'n': n, 'img': img, 'estado': estado, 'desde': desde, 'hasta': hasta,
             'alt': text(item.get('descripcion')) or cfg['alt'],
+            'sin_descripcion': not text(item.get('descripcion')),
             'pos': ENFOQUE.get(enfoque, cfg['pos']),
             'completa': text(item.get('ajuste')) == 'completa',
             'etiqueta': text(item.get('etiqueta')),
             'texto': text(item.get('texto')),
+            'enlace': enlace,
         })
     return out
+
+
+def fecha(d):
+    return f'{d.day} de {MESES[d.month - 1]} de {d.year}'
+
+
+def enlace_texto(enlace):
+    if enlace == 'agendar':
+        return 'abre "Agendar cita"'
+    if enlace.startswith('agendar:'):
+        return f'abre "Agendar cita" con {enlace[8:]} elegido'
+    return f'lleva a la sección {SECCIONES.get(enlace, enlace)}'
 
 
 def badge_html(item):
     if not item['etiqueta'] and not item['texto']:
         return ''
-    parts = ['<div class="photo-badge">']
+    inner = ''
     if item['etiqueta']:
-        parts.append(f'<div class="eyebrow">{html.escape(item["etiqueta"])}</div>')
+        inner += f'<div class="eyebrow">{html.escape(item["etiqueta"])}</div>'
     if item['texto']:
-        parts.append(f'<div class="photo-badge-text">{html.escape(item["texto"])}</div>')
-    parts.append('</div>')
-    return ''.join(parts)
+        inner += f'<div class="photo-badge-text">{html.escape(item["texto"])}</div>'
+    enlace = item['enlace']
+    if not enlace:
+        return f'<div class="photo-badge">{inner}</div>'
+    arrow = '<span class="photo-badge-arrow" aria-hidden="true">→</span>'
+    if enlace.startswith('agendar'):
+        servicio = enlace[8:]
+        data = f' data-servicio="{attr(servicio)}"' if servicio else ''
+        return (f'<a class="photo-badge is-link" href="{attr(WA_GENERAL)}" target="_blank" rel="noopener" '
+                f'data-agendar{data}>{inner}{arrow}</a>')
+    return f'<a class="photo-badge is-link" href="{enlace}">{inner}{arrow}</a>'
 
 
 def render_slides(slot, items):
@@ -216,59 +281,175 @@ def render_slides(slot, items):
     out = []
     for i, item in enumerate(items):
         first = i == 0
-        img = item['img']
         cls = 'slide' + (' is-active' if first else '') + (' is-full' if item['completa'] else '')
-        parts = ['<img']
+        attrs = f'alt="{attr(item["alt"])}" style="object-position:{item["pos"]}"'
         if first:
-            parts.append(f'src="{attr(img["src"])}" srcset="{attr(img["srcset"])}"')
-        else:  # se cargan cuando el carrusel llega a ellas
-            parts.append(f'data-src="{attr(img["src"])}" data-srcset="{attr(img["srcset"])}"')
-        parts.append(f'sizes="{cfg["sizes"]}" width="{img["width"]}" height="{img["height"]}"')
-        parts.append(f'alt="{attr(item["alt"])}" style="object-position:{item["pos"]}"')
-        if first:
-            parts.append('fetchpriority="high"' if slot == 'portada' else 'loading="lazy"')
-        parts.append('decoding="async">')
-        out.append(f'<div class="{cls}">' + ' '.join(parts) + badge_html(item) + '</div>')
+            attrs += ' fetchpriority="high"' if slot == 'portada' else ' loading="lazy"'
+        attrs += ' decoding="async"'
+        # solo la primera se carga de entrada; las demás cuando el carrusel llega a ellas
+        out.append(f'<div class="{cls}">' + picture(item['img'], cfg['sizes'], attrs, lazy=not first) + badge_html(item) + '</div>')
     return out
 
 
-def render_preview(fotos, today):
-    """vista-previa.html: cada foto recortada en el tamaño real de su espacio."""
+def visible_fraction(img, frame):
+    """Qué parte de la foto se ve al llenar un marco (object-fit: cover)."""
+    iw, ih = img['orig_w'], img['orig_h']
+    fw, fh = frame
+    scale = max(fw / iw, fh / ih)
+    return (fw * fh) / (iw * ih * scale * scale)
+
+
+def collect_notices(fotos, promos_raw, optimize, today):
+    """Avisos para quien administra las fotos: lo que conviene revisar antes de compartir la página."""
+    notices = []  # (nivel, dónde, mensaje) — nivel: 'revisar' o 'info'
+    for slot, cfg in SLOTS.items():
+        for item in fotos.get(slot) or []:
+            where = f'{cfg["titulo"]} · foto {item["n"]}'
+            img = item['img']
+            if item['estado']:
+                notices.append(('info', where, f'{item["estado"].capitalize()}.'))
+            if img['orig_w'] < MIN_ANCHO:
+                notices.append(('revisar', where, f'La foto mide {img["orig_w"]} px de ancho y puede verse borrosa en computadora. '
+                                                  f'Lo ideal es subirla de 1200 px o más.'))
+            if item['sin_descripcion']:
+                notices.append(('revisar', where, 'No tiene descripción. Ayuda a personas con discapacidad visual y a Google.'))
+            if not item['completa']:
+                cortes = [f'{label} ({round(visible_fraction(img, frame) * 100)} %)'
+                          for label, frame in cfg['marcos'].items() if visible_fraction(img, frame) < MIN_VISIBLE]
+                if cortes:
+                    notices.append(('revisar', where, 'Se recorta mucho; se ve menos de la mitad de la foto en ' + ', '.join(cortes)
+                                    + '. Revisa abajo que no se corte lo importante, o usa "Mostrar completa".'))
+    for i, p in enumerate(promos_raw if isinstance(promos_raw, list) else [], 1):
+        if isinstance(p, dict) and text(p.get('imagen')):
+            img = optimize(p['imagen'])
+            if img and img['orig_w'] < 800:
+                notices.append(('revisar', f'Promoción {i}', f'El flyer mide {img["orig_w"]} px de ancho y puede verse borroso.'))
+    # Fotos subidas al panel que no se usan en ninguna sección ni promoción
+    used = set()
+    for f in (ROOT / 'content').glob('*.json'):
+        for m in re.findall(r'assets/uploads/[^"\\]+', f.read_text(encoding='utf-8')):
+            used.add(urllib.parse.unquote(m))
+    uploads = ROOT / 'assets' / 'uploads'
+    for f in sorted(uploads.iterdir()) if uploads.is_dir() else []:
+        if f.is_file() and not f.name.startswith('.') and f'assets/uploads/{f.name}' not in used:
+            notices.append(('info', 'Fotos subidas', f'"{f.name}" está subida pero no se usa en ninguna sección ni promoción.'))
+    for w in warnings:
+        notices.append(('revisar', 'Publicación', w[0].upper() + w[1:] + '.'))
+    return notices
+
+
+def promo_states(items, optimize, today):
+    """Todas las promociones del panel con su estado, para la vista previa."""
+    out = []
+    for i, p in enumerate(items if isinstance(items, list) else [], 1):
+        if not isinstance(p, dict):
+            continue
+        vence = parse_date(p.get('vence'), f'la promoción {i}')
+        titulo = text(p.get('titulo'))
+        img = optimize(p['imagen']) if text(p.get('imagen')) else None
+        if p.get('activa') is False:
+            estado, nivel = 'Oculta ("Mostrar en la web" desmarcado)', 'off'
+        elif not img and not titulo:
+            estado, nivel = 'No se muestra: le falta imagen y título', 'off'
+        elif vence and vence < today:
+            estado, nivel = f'Vencida el {fecha(vence)}', 'off'
+        elif vence:
+            dias = (vence - today).days
+            estado = f'Vigente hasta el {fecha(vence)}' + (' (vence hoy)' if dias == 0 else f' (quedan {dias} días)')
+            nivel = 'on'
+        else:
+            estado, nivel = 'Vigente, sin fecha de fin', 'on'
+        out.append({'n': i, 'titulo': titulo, 'precio': text(p.get('precio')), 'desc': text(p.get('descripcion')),
+                    'img': img, 'estado': estado, 'nivel': nivel})
+    return out
+
+
+def render_preview(fotos, promos, notices, today):
+    """vista-previa.html: avisos, promociones y cada foto recortada en el tamaño real de su espacio."""
     css = (
         "body{margin:0;padding:24px 16px 64px;background:#f2ede8;color:#14213d;font:16px/1.5 'Schibsted Grotesk',system-ui,sans-serif}"
         ".pv-wrap{max-width:1400px;margin:0 auto}h1{font-size:32px;line-height:1.1;letter-spacing:-.03em;margin:0}"
         "h2{margin:48px 0 4px;font-size:24px;letter-spacing:-.02em}.pv-note{color:#3a4254;max-width:760px;margin:12px 0 0}"
+        ".pv-toc{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;font-weight:600}.pv-toc a{color:#0a6e70}"
         ".pv-photo{margin-top:20px;padding:16px;background:#fff;border:1px solid #ddd4c9;border-radius:10px}"
+        ".pv-photo.is-off{opacity:.6}"
         ".pv-meta{font-size:14px;color:#565c6b;margin-bottom:12px}.pv-meta b{color:#14213d}"
         ".pv-frames{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}"
         ".pv-frame figcaption{font:600 12px/1.2 'Schibsted Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#565c6b;margin-bottom:6px}"
         ".pv-box{position:relative;overflow:hidden;border-radius:10px;background:#e5ddd3;outline:1px dashed #8a8f9c}"
         ".pv-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}"
         ".pv-box.is-full img{object-fit:contain;background:#f2ede8}.pv-empty{color:#565c6b;font-style:italic}"
+        ".pv-tag{display:inline-block;padding:3px 8px;border-radius:4px;font:600 12px/1.3 'Schibsted Grotesk',sans-serif;letter-spacing:.06em}"
+        ".pv-tag.on{background:#06cacb;color:#14213d}.pv-tag.off{background:#ebe5de;color:#565c6b}.pv-tag.warn{background:#fdf1f1;color:#7a1515;border:1px solid #a42323}"
+        ".pv-notices{margin-top:16px;padding:0;list-style:none;background:#fff;border:1px solid #ddd4c9;border-radius:10px}"
+        ".pv-notices li{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-top:1px solid #ddd4c9}.pv-notices li:first-child{border-top:0}"
+        ".pv-notices .pv-where{flex:none;width:190px;font-weight:600}.pv-ok{margin-top:16px;padding:14px 16px;background:#fff;border:1px solid #ddd4c9;border-radius:10px}"
+        ".pv-promos{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px}.pv-promo{width:260px;background:#fff;border:1px solid #ddd4c9;border-radius:10px;overflow:hidden}"
+        ".pv-promo.is-off{opacity:.6}.pv-promo .pv-flyer{aspect-ratio:4/5;background:#f2ede8}.pv-promo .pv-flyer img{display:block;width:100%;height:100%;object-fit:contain}"
+        ".pv-promo .pv-body{padding:12px 14px;font-size:14px}.pv-promo h3{margin:6px 0 2px;font-size:17px;line-height:1.25}"
+        "@media (max-width:640px){.pv-notices li{flex-direction:column;gap:2px}.pv-notices .pv-where{width:auto}}"
     )
+    revisar = sum(1 for n in notices if n[0] == 'revisar')
     out = ['<!DOCTYPE html>', '<html lang="es"><head><meta charset="utf-8">',
            '<meta name="viewport" content="width=device-width, initial-scale=1">',
            '<meta name="robots" content="noindex, nofollow">',
            '<title>Vista previa de fotos — Opto Service</title>',
+           '<link rel="icon" href="favicon.ico" sizes="48x48">',
            '<link rel="stylesheet" href="assets/css/styles.css">',
            f'<style>{css}</style></head><body><div class="pv-wrap">',
-           '<h1>Vista previa de fotos</h1>',
-           '<p class="pv-note">Así se recorta cada foto en celular, tablet y computadora (a la mitad de su tamaño real). '
-           'Si una cara o un detalle importante queda cortado, cambia el campo <b>Parte de la foto que siempre debe verse</b> '
-           'en el panel, o elige <b>Mostrar completa</b> en <b>Cómo llenar el espacio</b>. '
-           f'Generada el {today.day} de {MESES[today.month - 1]} de {today.year}.</p>']
+           '<h1>Vista previa de fotos y promociones</h1>',
+           '<p class="pv-note">Revisa aquí lo que subes al panel antes de compartir la página. Cada foto aparece recortada como se ve en '
+           'celular, tablet y computadora (a la mitad de su tamaño real). Si una cara o un detalle importante queda cortado, cambia '
+           '<b>Parte de la foto que siempre debe verse</b> en el panel, o elige <b>Mostrar completa</b> en <b>Cómo llenar el espacio</b>. '
+           f'Generada el {fecha(today)}; se actualiza 1-2 minutos después de cada cambio.</p>',
+           '<nav class="pv-toc"><a href="#avisos">Avisos' + (f' ({revisar} por revisar)' if revisar else '') + '</a>'
+           '<a href="#promos">Promociones</a>'
+           + ''.join(f'<a href="#pv-{slot}">{html.escape(cfg["titulo"])}</a>' for slot, cfg in SLOTS.items()) + '</nav>']
+
+    out.append('<h2 id="avisos">Avisos</h2>')
+    if notices:
+        out.append('<ul class="pv-notices">')
+        for nivel, where, msg in sorted(notices, key=lambda n: n[0] != 'revisar'):
+            tag = '<span class="pv-tag warn">Revisar</span>' if nivel == 'revisar' else '<span class="pv-tag off">Info</span>'
+            out.append(f'<li>{tag}<span class="pv-where">{html.escape(where)}</span><span>{html.escape(msg)}</span></li>')
+        out.append('</ul>')
+    else:
+        out.append('<p class="pv-ok">Todo en orden: ninguna foto ni promoción necesita revisión.</p>')
+
+    out.append('<h2 id="promos">Promociones</h2>')
+    if not promos:
+        out.append('<p class="pv-empty">No hay promociones cargadas. La sección y el enlace del menú no se muestran.</p>')
+    else:
+        out.append('<div class="pv-promos">')
+        for p in promos:
+            flyer = (f'<div class="pv-flyer"><img src="{attr(p["img"]["src"])}" alt="" loading="lazy"></div>' if p['img']
+                     else '<div class="pv-flyer"></div>')
+            out.append(f'<div class="pv-promo{" is-off" if p["nivel"] == "off" else ""}">{flyer}<div class="pv-body">'
+                       f'<span class="pv-tag {p["nivel"]}">{html.escape(p["estado"])}</span>'
+                       f'<h3>{html.escape(p["titulo"] or "(sin título)")}</h3>'
+                       + (f'<div><b>{html.escape(p["precio"])}</b></div>' if p['precio'] else '')
+                       + (f'<div>{html.escape(p["desc"])}</div>' if p['desc'] else '')
+                       + '</div></div>')
+        out.append('</div>')
+
     for slot, cfg in SLOTS.items():
         items = fotos.get(slot) or []
-        out.append(f'<h2>{html.escape(cfg["titulo"])}</h2>')
+        visibles = [i for i in items if not i['estado']]
+        out.append(f'<h2 id="pv-{slot}">{html.escape(cfg["titulo"])}</h2>')
         if not items:
             out.append('<p class="pv-empty">Sin fotos' + (': este espacio no se muestra en la página.' if cfg.get('opcional') else '.') + '</p>')
             continue
-        for n, item in enumerate(items, 1):
+        if not visibles:
+            out.append('<p class="pv-empty">Ninguna foto está dentro de sus fechas: '
+                       + ('este espacio no se muestra en la página.' if cfg.get('opcional') else 'se muestra la foto por defecto.') + '</p>')
+        for item in items:
             img = item['img']
-            name = img['src'].rsplit('/', 1)[-1]
             ajuste = 'mostrar completa' if item['completa'] else 'llenar el espacio'
-            out.append('<div class="pv-photo">')
-            out.append(f'<div class="pv-meta"><b>Foto {n}</b> · {html.escape(item["alt"])} · encuadre {item["pos"]} · {ajuste} · <code>{html.escape(name)}</code></div>')
+            estado = (f'<span class="pv-tag off">{html.escape(item["estado"].capitalize())}</span> ' if item['estado']
+                      else '<span class="pv-tag on">Se muestra</span> ')
+            out.append(f'<div class="pv-photo{" is-off" if item["estado"] else ""}">')
+            out.append(f'<div class="pv-meta">{estado}<b>Foto {item["n"]}</b> · {html.escape(item["alt"])} · {img["orig_w"]}×{img["orig_h"]} px · '
+                       f'encuadre {item["pos"]} · {ajuste} · <code>{html.escape(img["rel"].rsplit("/", 1)[-1])}</code></div>')
             out.append('<div class="pv-frames">')
             for label, (w, h) in cfg['marcos'].items():
                 cls = 'pv-box is-full' if item['completa'] else 'pv-box'
@@ -278,7 +459,9 @@ def render_preview(fotos, today):
                            f'</div></figure>')
             out.append('</div>')
             if item['etiqueta'] or item['texto']:
-                out.append(f'<div class="pv-meta" style="margin:12px 0 0">Recuadro sobre la foto: <b>{html.escape(item["etiqueta"])}</b> {html.escape(item["texto"])}</div>')
+                link = f' · el recuadro {enlace_texto(item["enlace"])}' if item['enlace'] else ''
+                out.append(f'<div class="pv-meta" style="margin:12px 0 0">Recuadro sobre la foto: <b>{html.escape(item["etiqueta"])}</b> '
+                           f'{html.escape(item["texto"])}{html.escape(link)}</div>')
             out.append('</div>')
     out.append('</div></body></html>')
     return '\n'.join(out) + '\n'
@@ -305,10 +488,8 @@ def render_promos(items, optimize, today):
 
         card = ['<article class="promo-card"' + (f' data-vence="{vence.isoformat()}">' if vence else '>')]
         if img:
-            card.append(
-                f'  <div class="promo-media"><img src="{attr(img["src"])}" srcset="{attr(img["srcset"])}" '
-                f'sizes="{PROMO_SIZES}" width="{img["width"]}" height="{img["height"]}" '
-                f'alt="{attr(titulo or "Promoción de Opto Service")}" loading="lazy" decoding="async"></div>')
+            card.append('  <div class="promo-media">' + picture(
+                img, PROMO_SIZES, f'alt="{attr(titulo or "Promoción de Opto Service")}" loading="lazy" decoding="async"') + '</div>')
         card.append('  <div class="promo-body">')
         if precio:
             card.append(f'    <div class="promo-price">{html.escape(precio)}</div>')
@@ -443,23 +624,24 @@ def main():
     fotos = {}
     for slot, cfg in SLOTS.items():
         data = load_json(cfg['archivo'])
-        items = slide_items(slot, data.get(cfg['lista']), optimize)
+        items = slide_items(slot, data.get(cfg['lista']), optimize, today)
         fotos[slot] = items
+        visibles = [i for i in items if not i['estado']]  # dentro de sus fechas
         segundos = data.get('segundos')
         if isinstance(segundos, bool) or not isinstance(segundos, (int, float)) or not math.isfinite(segundos):
             segundos = 5
         interval = int(min(max(segundos, 3), 20) * 1000)
         page = re.sub(r'(data-carousel="%s" data-interval=")\d+"' % slot, r'\g<1>%d"' % interval, page)
-        if items:
-            page = replace_block(page, f'fotos:{slot}', render_slides(slot, items))
+        if visibles:
+            page = replace_block(page, f'fotos:{slot}', render_slides(slot, visibles))
             page = re.sub(r'(data-carousel="%s"[^>]*?) hidden>' % slot, r'\1>', page)
         elif cfg.get('opcional'):
             page = replace_block(page, f'fotos:{slot}', [])
         else:
-            warn(f'"{cfg["titulo"]}" no tiene fotos válidas; se deja la foto por defecto')
-    (out / 'vista-previa.html').write_text(render_preview(fotos, today), encoding='utf-8')
+            warn(f'"{cfg["titulo"]}" no tiene fotos para hoy; se deja la foto por defecto')
 
-    cards = render_promos(load_json('promociones.json').get('promociones'), optimize, today)
+    promos_raw = load_json('promociones.json').get('promociones')
+    cards = render_promos(promos_raw, optimize, today)
     page = replace_block(page, 'promociones', cards)
     if cards:
         page = page.replace('data-promos hidden', 'data-promos').replace(' data-promo-link hidden', ' data-promo-link')
@@ -468,6 +650,10 @@ def main():
     if chat:
         for name, lines in chat.items():
             page = replace_block(page, name, lines)
+
+    notices = collect_notices(fotos, promos_raw, optimize, today)
+    (out / 'vista-previa.html').write_text(
+        render_preview(fotos, promo_states(promos_raw, optimize, today), notices, today), encoding='utf-8')
 
     page = version_assets(out, page)
     (out / 'index.html').write_text(page, encoding='utf-8')
