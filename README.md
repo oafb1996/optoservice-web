@@ -24,11 +24,13 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 
 ```
 index.html                  Página de inicio (con marcadores donde se insertan fotos, promociones, sucursales y equipo)
-paginas/*.html              Otras páginas (terapia-visual, 404); toman encabezado y pie de index.html
+paginas/*.html              Otras páginas (terapia-visual, privacidad, 404); toman encabezado y pie de index.html
 content/fotos-*.json        Fotos de cada sección (portada, examen, nosotros, sucursales)  ← lo edita Pages CMS
 content/promociones.json    Promociones del mes              ← lo edita Pages CMS
 content/sucursales.json     Dirección, horario, coordenadas y enlace de reseñas de cada sucursal  ← Pages CMS
 content/equipo.json         Equipo de la sección Nosotros     ← lo edita Pages CMS
+content/analitica.json      ID de Google Analytics 4 (vacío = sin medición)  ← Pages CMS
+assets/js/medicion.js       Eventos de clic para GA4 (solo se carga con la medición activa)
 assets/uploads/             Fotos subidas desde el panel
 assets/css/styles.css       Estilos
 assets/js/main.js           Menú móvil, "Agendar cita" en 3 pasos, FAQ, formulario, carruseles
@@ -85,6 +87,28 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
 Revisar los datos estructurados en `https://validator.schema.org/` después de publicar. Esto facilita el rastreo; no garantiza indexación ni posiciones.
+
+## Medición y origen de las consultas
+
+**Mensajes de WhatsApp.** El build agrega "Vengo de la página web." a todos los mensajes de WhatsApp de la web (botones, promociones, chat), y la hoja "Agendar cita" escribe "Vengo de la página web (Masaya)" con la sucursal elegida. Así recepción sabe qué consultas llegan por la web: es la métrica más confiable, porque un clic no es una cita.
+
+**Google Analytics 4.** Se activa solo si se cumplen las dos condiciones:
+
+1. Hay un ID en Pages CMS (*Medición (Google Analytics)*, archivo `content/analitica.json`).
+2. La política de privacidad está publicada: sin la línea `<meta name="borrador">` en `paginas/privacidad.html`. Mientras sea borrador, la medición queda apagada aunque haya ID, y el pie no enlaza la política.
+
+GA4 se carga diferido y sin señales de publicidad. `assets/js/medicion.js` envía estos eventos, sin nombres, mensajes, servicio elegido ni datos de salud:
+
+| Evento | Cuándo | Parámetros |
+|---|---|---|
+| `clic_whatsapp` | enlace a WhatsApp (intención, no consulta confirmada) | `ubicacion`, `sucursal` si se sabe |
+| `abrir_agendar` | se abre la hoja "Agendar cita" | `ubicacion` |
+| `clic_telefono` | enlace `tel:` | `ubicacion` |
+| `como_llegar` | botón "Cómo llegar" | `sucursal` |
+| `clic_resena` | botón de reseña en Google | `sucursal` |
+| `generate_lead` | formulario de empresas enviado con éxito | `metodo: empresa` |
+
+Para probar: con el ID cargado y la política publicada, abrir la web con la extensión *Google Analytics Debugger* o en GA4 → Administrar → DebugView, y tocar cada tipo de botón. En GA4 conviene registrar `ubicacion` y `sucursal` como dimensiones personalizadas (de evento) para verlas en los informes.
 
 Pendientes fuera del código: completar la reclamación del perfil de Diriomo y cargar su enlace de reseñas en Pages CMS; confirmar los pines, datos y fotos de ambos perfiles. No se agregó analítica: requiere definir la medición, configurar la propiedad y revisar la política de privacidad primero.
 

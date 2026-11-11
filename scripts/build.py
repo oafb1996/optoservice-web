@@ -11,11 +11,13 @@
    como se verá en celular, tablet y computadora (no se enlaza desde la página
    ni la indexa Google).
 5. Inserta las sucursales (content/sucursales.json) en el inicio, el pie y los datos estructurados.
-6. Genera las demás páginas desde paginas/ (terapia-visual.html, 404.html). El encabezado, el pie y la hoja de
+6. Genera las demás páginas desde paginas/ (terapia-visual, privacidad, 404). El encabezado, el pie y la hoja de
    "Agendar cita" se copian de index.html, así hay una sola versión de cada uno.
    Una página con <meta name="borrador"> se publica con noindex y un aviso, fuera del sitemap y sin
    enlaces desde las demás (los enlaces con data-requiere="<página>" se quitan).
-7. Genera sitemap.xml con las páginas publicadas.
+7. Agrega el origen a los mensajes de WhatsApp ("Vengo de la página web") y, si hay ID en
+   content/analitica.json y la política de privacidad está publicada, Google Analytics 4.
+8. Genera sitemap.xml con las páginas publicadas.
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -602,12 +604,17 @@ def version_assets(out, pages):
     assets = out / 'assets'
     point(assets / 'js' / 'chat.js', "'/assets/css/chat.css'", assets / 'css' / 'chat.css')
     point(assets / 'js' / 'main.js', "'/assets/js/chat.js'", assets / 'js' / 'chat.js')
-    stamps = {'css/styles.css': stamp(assets / 'css' / 'styles.css'), 'js/main.js': stamp(assets / 'js' / 'main.js')}
+    stamps = {'css/styles.css': stamp(assets / 'css' / 'styles.css'), 'js/main.js': stamp(assets / 'js' / 'main.js'),
+              'js/medicion.js': stamp(assets / 'js' / 'medicion.js')}
+    optional = {'js/medicion.js'}  # solo cuando la medición está activa
     result = {}
     for name, page in pages.items():
         for rel, st in stamps.items():
             pattern = r'((?:href|src)="/?assets/%s)"' % re.escape(rel)
-            if len(re.findall(pattern, page)) != 1:
+            found = len(re.findall(pattern, page))
+            if rel in optional and found == 0:
+                continue
+            if found != 1:
                 warn(f'{name}: no se encontró assets/{rel}; no se le puso versión')
                 continue
             page = re.sub(pattern, r'\1?v=%s"' % st, page)
@@ -805,6 +812,45 @@ def drop_links(page, drafts):
     return page
 
 
+ORIGEN_WA = 'Vengo de la página web.'
+SALUDO_WA = '¡Hola Opto Service!'
+
+
+def tag_whatsapp(page):
+    """Todos los mensajes de WhatsApp de la web dicen que vienen de la página (para saberlo en recepción).
+
+    Los que ya mencionan la página web (o no traen texto) se dejan igual. La hoja "Agendar cita"
+    arma su propio mensaje en main.js, con la sucursal elegida.
+    """
+    def fix(match):
+        msg = urllib.parse.unquote(match.group(2))
+        if 'página web' in msg:
+            return match.group(0)
+        if msg.startswith(SALUDO_WA):
+            msg = f'{SALUDO_WA} {ORIGEN_WA}{msg[len(SALUDO_WA):]}'
+        else:
+            msg = f'{SALUDO_WA} {ORIGEN_WA} {msg}'
+        return match.group(1) + urllib.parse.quote(msg, safe='')
+    return re.sub(r'(https://wa\.me/%s\?text=)([^"&\s<]+)' % WHATSAPP, fix, page)
+
+
+def load_analytics():
+    """ID de Google Analytics 4 (content/analitica.json). Vacío o dudoso: sin medición."""
+    ga = text(load_json('analitica.json').get('ga4'))
+    if ga and not re.fullmatch(r'G-[A-Z0-9]{4,20}', ga):
+        warn('content/analitica.json: "ga4" no parece un ID de GA4 (G-XXXXXXX); no se agrega la medición')
+        return ''
+    return ga
+
+
+def render_analytics(ga):
+    """GA4 sin señales de publicidad, más medicion.js (eventos de clic sin datos personales). Todo diferido."""
+    return (f'<script async src="https://www.googletagmanager.com/gtag/js?id={ga}"></script>\n'
+            '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
+            f"gtag('js',new Date());gtag('config','{ga}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>\n"
+            '<script src="/assets/js/medicion.js" defer></script>\n')
+
+
 def write_sitemap(out, pages):
     """sitemap.xml con la URL canónica de cada página publicable (sin noindex).
 
@@ -908,7 +954,15 @@ def main():
             drafts.append(src.stem)
             warn(f'{src.name} está en borrador ({motivo}): se publica con noindex y sin enlaces')
         pages[src.name] = fill_common(other, comunes, src.name)
-    pages = {name: drop_links(p, drafts) for name, p in pages.items()}
+    pages = {name: tag_whatsapp(drop_links(p, drafts)) for name, p in pages.items()}
+
+    # Medición: solo con ID válido y con la política de privacidad publicada (no en borrador)
+    ga = load_analytics()
+    if ga and ('privacidad.html' not in pages or 'privacidad' in drafts):
+        warn('hay ID de GA4, pero la política de privacidad no está publicada; la medición queda apagada')
+        ga = ''
+    if ga:
+        pages = {name: p.replace('</head>', render_analytics(ga) + '</head>', 1) for name, p in pages.items()}
 
     notices = collect_notices(fotos, promos_raw, optimize, today)
     (out / 'vista-previa.html').write_text(
@@ -922,6 +976,7 @@ def main():
           f'{len(pages)} páginas ({len(drafts)} en borrador), '
           f'{len(optimize.cache)} imágenes optimizadas, {sum(1 for c in cards if c.startswith("<article"))} promociones vigentes'
           + (', asistente de chat ACTIVO' if chat else '')
+          + (f', medición GA4 {ga}' if ga else ', sin medición')
           + (f', {len(warnings)} avisos' if warnings else ''))
 
 if __name__ == '__main__':

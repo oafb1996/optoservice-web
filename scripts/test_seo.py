@@ -1,5 +1,6 @@
 """Comprueba el sitio generado: python -m unittest discover -s scripts -p 'test_*.py'."""
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -7,7 +8,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -191,6 +192,55 @@ class OtherPages(unittest.TestCase):
                 self.assertEqual((saturday['opens'], saturday['closes']), (suc['sabado']['abre'], suc['sabado']['cierra']))
                 reviews = [a for tag, a in home.tags if tag == 'a' and a.get('data-resena') == sid]
                 self.assertEqual([a['href'] for a in reviews], [suc['resenas']] if suc['resenas'] else [])
+
+
+    def test_whatsapp_messages_say_they_come_from_the_web(self):
+        for name in self.pages:
+            text = (self.site / name).read_text()
+            for encoded in re.findall(r'wa\.me/\d+\?text=([^"&\s<]+)', text):
+                with self.subTest(page=name, message=unquote(encoded)[:60]):
+                    self.assertIn('página web', unquote(encoded))
+
+    def test_no_analytics_while_privacy_policy_is_a_draft(self):
+        source = ROOT / 'paginas' / 'privacidad.html'
+        if source.is_file() and '<meta name="borrador"' not in source.read_text():
+            self.skipTest('la política está publicada')
+        for name in self.pages:
+            with self.subTest(name):
+                text = (self.site / name).read_text()
+                self.assertNotIn('googletagmanager', text)
+                self.assertNotIn('medicion.js', text)
+
+
+class Helpers(unittest.TestCase):
+    """Funciones de scripts/build.py que no dependen del contenido actual."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        import build
+        cls.build = build
+
+    def test_tag_whatsapp_adds_origin_once(self):
+        link = 'https://wa.me/50584024868?text=' + quote('¡Hola Opto Service! Quiero una cita.', safe='')
+        once = self.build.tag_whatsapp(f'<a href="{link}">')
+        self.assertIn(quote('¡Hola Opto Service! Vengo de la página web. Quiero una cita.', safe=''), once)
+        self.assertEqual(self.build.tag_whatsapp(once), once)
+        other = 'https://wa.me/50584024868?text=' + quote('Me interesa la promo', safe='')
+        self.assertIn(quote('¡Hola Opto Service! Vengo de la página web. Me interesa la promo', safe=''),
+                      self.build.tag_whatsapp(other))
+
+    def test_analytics_has_no_ad_signals_and_is_deferred(self):
+        snippet = self.build.render_analytics('G-TEST1234')
+        self.assertIn('allow_google_signals:false', snippet)
+        self.assertIn('allow_ad_personalization_signals:false', snippet)
+        self.assertIn('<script async src="https://www.googletagmanager.com/gtag/js?id=G-TEST1234">', snippet)
+        self.assertIn('<script src="/assets/js/medicion.js" defer>', snippet)
+
+    def test_tracking_script_sends_no_personal_or_health_data(self):
+        code = (ROOT / 'assets/js/medicion.js').read_text().split('(function', 1)[1]  # sin el comentario inicial
+        for forbidden in ('name="servicio"', 'name="nombre"', 'elements.nombre', 'mensaje', 'correo', 'FormData'):
+            self.assertNotIn(forbidden, code)
 
 
 if __name__ == '__main__':

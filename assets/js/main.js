@@ -57,7 +57,8 @@
     var message = function () {
       var svc = value('servicio'), br = value('sucursal'), when = value('cuando');
       var name = (sForm.elements.nombre.value || '').replace(/\s+/g, ' ').trim().slice(0, 60);
-      var msg = '¡Hola Opto Service! ' + (svc && svc !== 'no-seguro'
+      // "Vengo de la página web (sucursal)": así en recepción saben que la consulta llegó por la web
+      var msg = '¡Hola Opto Service! Vengo de la página web' + (br ? ' (' + br + ')' : '') + '. ' + (svc && svc !== 'no-seguro'
         ? 'Quisiera agendar una cita para: ' + svc
         : 'Quisiera agendar una cita, pero no estoy seguro de qué servicio necesito');
       if (br) msg += ', en la sucursal de ' + br;
@@ -185,6 +186,7 @@
         form.hidden = true;
         success.hidden = false;
         success.focus();
+        document.dispatchEvent(new CustomEvent('opto:afiliacion-enviada')); // para la medición (sin datos)
       }).catch(function () {
         showError('No pudimos enviar tu solicitud. Revisa tu conexión e inténtalo de nuevo. También puedes');
       }).then(function () {
