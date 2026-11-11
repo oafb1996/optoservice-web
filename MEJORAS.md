@@ -35,7 +35,7 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [ ] *(pospuesto)* Alta en Google Search Console.
 - [ ] *(pospuesto)* Enlazar la web desde el perfil de Google Business.
 - [ ] *(pospuesto)* Mapas con el pin exacto de cada sucursal (desde Google Business).
-- [x] Página por sucursal (`/masaya`, `/diriomo`), página de terapia visual (borrador para revisión médica) y página 404.
+- [x] Sucursales con ancla propia en el inicio (`/#masaya`, `/#diriomo`), página de terapia visual (borrador para revisión médica) y página 404.
 - [ ] Equipo en la sección Nosotros: listo en Pages CMS (*Equipo · Nosotros*), faltan nombres, títulos y fotos.
 - [ ] *(pendiente, se retoma después)* Elementos de confianza: quién atiende (nombre, título, foto), reseñas de pacientes, fotos reales de las sucursales.
 

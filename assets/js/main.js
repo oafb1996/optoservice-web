@@ -86,13 +86,11 @@
       opener = from || null;
       sForm.reset();
       step = 1;
-      // Un enlace puede dejar elegidos el servicio (el recuadro de una foto) o la sucursal (su página)
-      ['servicio', 'sucursal'].forEach(function (field) {
-        var pre = from && from.getAttribute('data-' + field);
-        if (pre) {
-          sForm.querySelectorAll('input[name="' + field + '"]').forEach(function (r) { r.checked = r.value === pre; });
-        }
-      });
+      // Un enlace puede dejar elegido el servicio (por ejemplo, el recuadro de una foto)
+      var pre = from && from.getAttribute('data-servicio');
+      if (pre) {
+        sForm.querySelectorAll('input[name="servicio"]').forEach(function (r) { r.checked = r.value === pre; });
+      }
       setMenu(false);
       if (window.OptoChat && typeof window.OptoChat.close === 'function') window.OptoChat.close();
       render(false);

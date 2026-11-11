@@ -60,7 +60,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .sec-dark :focus-visible, .site-footer :focus-visible { outline-color: var(--turquesa); }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
+section[id], .branch[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
@@ -267,13 +267,12 @@ a.photo-badge:focus-visible { outline: 2px solid var(--marino); outline-offset: 
 .branch-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .branch-head h3 { font: 700 28px/1.1 var(--font); letter-spacing: -.035em; }
 .branch-addr { margin-top: 12px; color: var(--texto); }
+.branch-ref { margin-top: 6px; font-size: 15px; color: var(--suave); line-height: 1.5; }
 .hours { margin-top: 16px; display: grid; grid-template-columns: auto 1fr; gap: 0 20px; font-size: 15px; line-height: 1.2; }
 .hours dt, .hours dd { padding: 11px 0; border-top: 1px solid var(--raya); }
 .hours dt { color: var(--suave); }
 .hours dd { font-weight: 600; }
 .branch .btn { margin-top: 12px; }
-.branch-head h3 a { color: inherit; text-decoration: none; }
-.branch-head h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .branch-actions { display: flex; flex-wrap: wrap; gap: 0 10px; }
 
 /* ===== Preguntas frecuentes ===== */
@@ -418,7 +417,7 @@ details[open] .faq-icon::before { content: "–"; }
   .sheet-body fieldset.is-grid { grid-template-columns: 1fr; }
 }
 
-/* ===== Páginas internas (sucursales, terapia visual, 404) ===== */
+/* ===== Páginas internas (terapia visual, 404) ===== */
 .page-hero { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
 .page-hero .lead { max-width: 640px; font-size: clamp(17px, 1.8vw, 19px); line-height: 1.6; }
 .page-title { margin-top: 14px; font: 700 clamp(38px, 6vw, 72px)/.98 var(--font); letter-spacing: -.045em; text-wrap: balance; max-width: 900px; }
@@ -426,15 +425,6 @@ details[open] .faq-icon::before { content: "–"; }
 .crumbs li + li::before { content: "/"; margin: 0 8px; color: var(--raya); }
 .crumbs a { color: var(--marino); text-underline-offset: 3px; }
 .crumbs [aria-current] { color: var(--suave); }
-.branch-detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px clamp(24px, 5vw, 64px); align-items: start; }
-.branch-map.is-tall { height: clamp(260px, 40vw, 420px); }
-.branch-info .branch-addr { margin-top: 16px; font-size: 17px; line-height: 1.55; }
-.branch-ref { margin-top: 8px; color: var(--texto); line-height: 1.55; }
-.info-title { margin-top: 26px; font: 600 12px/1.2 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
-.branch-info .hours { margin-top: 8px; }
-.branch-contact { margin-top: 10px; font-size: 17px; }
-.branch-contact a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: 3px; }
-.branch-info .btn { margin-top: 16px; }
 .service-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--teal); font-weight: 600; text-underline-offset: 3px; }
 .prose { flex: 2 1 460px; min-width: 0; max-width: 720px; }
 .prose p { font-size: 17px; line-height: 1.65; color: var(--texto); }
@@ -443,8 +433,6 @@ details[open] .faq-icon::before { content: "–"; }
 .checklist li { padding: 16px 0 16px 30px; position: relative; line-height: 1.5; }
 .checklist li + li { border-top: 1px solid var(--raya); }
 .checklist li::before { content: ""; position: absolute; left: 0; top: 22px; width: 12px; height: 12px; border-radius: 50%; background: var(--turquesa); border: 1.5px solid var(--marino); }
-.review-cta { padding: clamp(20px, 4vw, 36px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
-.review-cta .lead { margin-top: 10px; }
 .links-404 { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .links-404 a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: 3px; }
 .page-404 { padding-bottom: var(--sec); }

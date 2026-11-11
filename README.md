@@ -2,7 +2,7 @@
 
 Sitio web de **Opto Service** — https://optoservicenic.com (Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua).
 
-Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio más una página por sucursal (`/masaya`, `/diriomo`), `/terapia-visual` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos y las promociones se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
+Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio (con las sucursales de Masaya y Diriomo), `/terapia-visual` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos y las promociones se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
 
 ## Administrar fotos y promociones (gerencia)
 
@@ -24,7 +24,6 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 
 ```
 index.html                  Página de inicio (con marcadores donde se insertan fotos, promociones, sucursales y equipo)
-paginas/_sucursal.html      Plantilla de /masaya y /diriomo (los datos salen de content/sucursales.json)
 paginas/*.html              Otras páginas (terapia-visual, 404); toman encabezado y pie de index.html
 content/sucursales.json     Dirección, horario, coordenadas y enlace de reseñas de cada sucursal  ← Pages CMS
 content/equipo.json         Equipo de la sección Nosotros     ← lo edita Pages CMS
@@ -50,9 +49,9 @@ MEJORAS.md                  Checklist de mejoras pendientes
 ## Páginas y SEO
 
 - **Encabezado, pie, botones flotantes y la hoja de "Agendar cita"** se escriben una sola vez en `index.html` (entre `<!--comun:...-->`) y `scripts/build.py` los copia a las demás páginas, con los enlaces ajustados (`#servicios` → `/#servicios`).
-- **Sucursales**: la dirección y el horario se editan en Pages CMS (*Sucursales*) y se actualizan en el inicio, en la página de cada sucursal, en el pie y en los datos estructurados para Google (JSON-LD `Optician`). Si se agrega el enlace de reseñas, aparece el botón "Déjanos tu reseña en Google".
+- **Sucursales**: la dirección y el horario se editan en Pages CMS (*Sucursales*) y se actualizan en la tarjeta de cada sucursal del inicio, en el pie y en los datos estructurados para Google (JSON-LD `Optician`). Cada tarjeta tiene su ancla (`/#masaya`, `/#diriomo`): es el enlace que va en cada Perfil de Empresa en Google. Si se agrega el enlace de reseñas, aparece el botón "Déjanos tu reseña en Google" en la tarjeta.
 - **Borradores**: una página de `paginas/` con `<meta name="borrador" content="...">` se publica con `noindex` y un aviso, fuera del sitemap, y se quitan los enlaces que la apuntan (`data-requiere="<página>"`). Los textos médicos pendientes están en `docs/revision-medica.md`.
-- **URLs**: GitHub Pages sirve `masaya.html` como `/masaya`. Los enlaces y el canonical usan siempre la versión sin `.html`.
+- **URLs**: GitHub Pages sirve `terapia-visual.html` como `/terapia-visual`. Los enlaces y el canonical usan siempre la versión sin `.html`.
 - **`sitemap.xml`** se genera con las páginas publicadas; la fecha es la del último commit.
 
 ## Agendar cita

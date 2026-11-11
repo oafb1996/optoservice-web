@@ -10,12 +10,12 @@
    recortadas o sin usar), las promociones con su estado y cada foto recortada
    como se verá en celular, tablet y computadora (no se enlaza desde la página
    ni la indexa Google).
-5. Genera las demás páginas desde paginas/: cada sucursal (paginas/_sucursal.html con los datos de
-   content/sucursales.json), terapia-visual.html y 404.html. El encabezado, el pie y la hoja de
+5. Inserta las sucursales (content/sucursales.json) en el inicio, el pie y los datos estructurados.
+6. Genera las demás páginas desde paginas/ (terapia-visual.html, 404.html). El encabezado, el pie y la hoja de
    "Agendar cita" se copian de index.html, así hay una sola versión de cada uno.
    Una página con <meta name="borrador"> se publica con noindex y un aviso, fuera del sitemap y sin
    enlaces desde las demás (los enlaces con data-requiere="<página>" se quitan).
-6. Genera sitemap.xml con las páginas publicadas.
+7. Genera sitemap.xml con las páginas publicadas.
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -47,7 +47,7 @@ WIDTHS = (480, 800, 1200)
 WHATSAPP = '50584024868'
 NICARAGUA = timezone(timedelta(hours=-6))
 DOMINIO = 'https://optoservicenic.com'  # el mismo de CNAME, canonical y datos estructurados
-# Sucursales: cada una tiene su página (/masaya, /diriomo); los datos están en content/sucursales.json
+# Sucursales: están en el inicio (/#masaya, /#diriomo); los datos están en content/sucursales.json
 SUCURSALES = {'masaya': 'Masaya', 'diriomo': 'Diriomo'}
 REDES = ['https://instagram.com/optoservicenic', 'https://facebook.com/profile.php?id=100092434450811',
          'https://tiktok.com/@optoservice']
@@ -634,7 +634,7 @@ def load_sucursales():
     for sid, nombre in SUCURSALES.items():
         raw = data.get(sid) if isinstance(data.get(sid), dict) else {}
         where = f'content/sucursales.json ({nombre})'
-        s = {'id': sid, 'nombre': nombre, 'url': f'{DOMINIO}/{sid}'}
+        s = {'id': sid, 'nombre': nombre, 'url': f'{DOMINIO}/#{sid}'}
         for campo in ('direccion', 'localidad', 'departamento', 'mapa'):
             s[campo] = text(raw.get(campo))
             if not s[campo]:
@@ -663,8 +663,6 @@ def load_sucursales():
             warn(f'enlace de reseñas no válido en {where}; se omite')
             s['resenas'] = ''
         s['lugar'] = f'{s["localidad"]}, {s["departamento"]}' if s['localidad'] != s['departamento'] else s['localidad']
-        s['wa'] = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote(
-            f'¡Hola Opto Service! Quiero agendar un examen visual en la sucursal de {nombre}. ¿Me ayudan con la cita?', safe='')
         s['mapa_src'] = 'https://maps.google.com/maps?q=' + urllib.parse.quote(s['mapa'], safe='') + '&z=15&output=embed'
         s['direcciones'] = 'https://www.google.com/maps/dir/?api=1&destination=' + urllib.parse.quote(s['mapa'], safe='')
         out[sid] = s
@@ -685,7 +683,7 @@ def horario_texto(s):
 def optician(s):
     node = {
         '@type': 'Optician',
-        '@id': f'{s["url"]}#optician',
+        '@id': f'{DOMINIO}/#optician-{s["id"]}',
         'name': f'Opto Service {s["nombre"]}',
         'description': (f'Óptica y optometría médica en {s["lugar"]}: examen visual completo, terapia visual, '
                         'optometría pediátrica, lentes oftálmicos y de contacto. Domingos previa cita.'),
@@ -715,31 +713,28 @@ def jsonld(nodes):
     return json.dumps(graph, ensure_ascii=False, indent=2).replace('<', '\\u003c')
 
 
-def breadcrumbs(*items):
-    return {'@type': 'BreadcrumbList', 'itemListElement': [
-        {'@type': 'ListItem', 'position': i, 'name': name, 'item': url} for i, (name, url) in enumerate(items, 1)]}
-
-
 def render_branch_card(s):
     """Mapa y datos de la tarjeta de una sucursal en el inicio."""
     return ([f'<iframe class="branch-map" src="{attr(s["mapa_src"])}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" '
              f'title="Mapa de la sucursal de {s["nombre"]}"></iframe>',
              '<div class="branch-body">',
-             f'  <div class="branch-head"><h3><a href="/{s["id"]}">{s["nombre"]}</a></h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>',
-             f'  <p class="branch-addr">{html.escape(s["direccion"])}.</p>',
-             '  <dl class="hours">']
+             f'  <div class="branch-head"><h3>{s["nombre"]}</h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>',
+             f'  <p class="branch-addr">{html.escape(s["direccion"])}.</p>']
+            + ([f'  <p class="branch-ref">{html.escape(s["como_llegar"])}</p>'] if s['como_llegar'] else [])
+            + ['  <dl class="hours">']
             + [f'    {line}' for line in horario_dl(s)]
             + ['  </dl>',
                '  <div class="branch-actions">',
-               f'    <a class="btn btn-primary btn-sm" href="/{s["id"]}">Ver sucursal<span class="sr-only"> de {s["nombre"]}</span></a>',
                f'    <a class="btn btn-outline btn-sm" href="{attr(s["direcciones"])}" target="_blank" rel="noopener" data-direcciones="{s["id"]}">'
-               f'Cómo llegar<span class="sr-only"> a la sucursal de {s["nombre"]}</span></a>',
-               '  </div>',
+               f'Cómo llegar<span class="sr-only"> a la sucursal de {s["nombre"]}</span></a>']
+            + ([f'    <a class="btn btn-outline btn-sm" href="{attr(s["resenas"])}" target="_blank" rel="noopener" data-resena="{s["id"]}">'
+                f'Déjanos tu reseña en Google<span class="sr-only"> sobre la sucursal de {s["nombre"]}</span></a>'] if s['resenas'] else [])
+            + ['  </div>',
                '</div>'])
 
 
 def render_footer_branches(sucs):
-    return [f'<p><strong><a href="/{s["id"]}">{s["nombre"]}</a></strong><br>{html.escape(s["direccion"])}.</p>' for s in sucs.values()]
+    return [f'<p><strong><a href="/#{s["id"]}">{s["nombre"]}</a></strong><br>{html.escape(s["direccion"])}.</p>' for s in sucs.values()]
 
 
 def render_team(items, optimize):
@@ -768,38 +763,6 @@ def render_team(items, optimize):
     if not cards:
         return []
     return ['<div class="team-head eyebrow">Nuestro equipo</div>', '<div class="team">'] + cards + ['</div>']
-
-
-def render_reviews(s):
-    if not s['resenas']:
-        return ''
-    return (f'<section class="sec" aria-labelledby="resena">\n    <div class="wrap">\n      <div class="card review-cta">\n'
-            f'        <div><div class="eyebrow">Tu opinión nos ayuda</div><h2 class="h2 h2-sm" id="resena">¿Ya nos visitaste en {s["nombre"]}?</h2>'
-            f'<p class="lead">Cuéntale a otras familias de {html.escape(s["localidad"])} cómo te atendimos.</p></div>\n'
-            f'        <a class="btn btn-primary" href="{attr(s["resenas"])}" target="_blank" rel="noopener" data-resena="{s["id"]}">Déjanos tu reseña en Google</a>\n'
-            '      </div>\n    </div>\n  </section>')
-
-
-def render_branch_page(template, s, otra):
-    como = f'<p class="branch-ref">{html.escape(s["como_llegar"])}</p>' if s['como_llegar'] else ''
-    valores = {
-        'id': s['id'], 'nombre': s['nombre'], 'url': s['url'], 'lugar': html.escape(s['lugar']),
-        'descripcion': attr(f'Opto Service {s["nombre"]}: óptica y optometría médica en {s["lugar"]}. Examen visual, '
-                            'terapia visual y lentes. Dirección, horario y citas por WhatsApp.'),
-        'direccion': html.escape(s['direccion']), 'como_llegar': como,
-        'horario': '\n          '.join(horario_dl(s)), 'horario_texto': horario_texto(s),
-        'wa': attr(s['wa']), 'mapa': attr(s['mapa_src']), 'direcciones': attr(s['direcciones']),
-        'otra_id': otra['id'], 'otra_nombre': otra['nombre'], 'resenas': render_reviews(s),
-        'jsonld': jsonld([optician(s), breadcrumbs(('Inicio', f'{DOMINIO}/'), ('Sucursales', f'{DOMINIO}/#sucursales'),
-                                                  (s['nombre'], s['url']))]),
-    }
-    page = template
-    for key, value in valores.items():
-        page = page.replace('{{%s}}' % key, value)
-    left = re.findall(r'\{\{\w+\}\}', page)
-    if left:
-        sys.exit(f'ERROR: paginas/_sucursal.html usa datos que no existen: {", ".join(sorted(set(left)))}')
-    return page
 
 
 def extract_block(page, name):
@@ -933,15 +896,7 @@ def main():
     # Demás páginas: comparten encabezado, pie y recursos con el inicio
     comunes = {name: absolutize(extract_block(page, name)) for name in ('comun:recursos', 'comun:cabecera', 'comun:pie')}
     pages, drafts = {'index.html': page}, []
-    template = (ROOT / 'paginas' / '_sucursal.html').read_text(encoding='utf-8')
-    ids = list(sucs)
-    for n, sid in enumerate(ids):
-        branch = render_branch_page(template, sucs[sid], sucs[ids[(n + 1) % len(ids)]])
-        branch = fill_common(branch, comunes, '_sucursal.html')
-        pages[f'{sid}.html'] = apply_slot(branch, sid, slides)
     for src in sorted((ROOT / 'paginas').glob('*.html')):
-        if src.name.startswith('_'):
-            continue
         other, motivo = mark_draft(src.read_text(encoding='utf-8'))
         if motivo:
             drafts.append(src.stem)

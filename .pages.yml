@@ -419,7 +419,7 @@ content:
     type: file
     path: content/sucursales.json
     format: json
-    description: Los domingos se muestran siempre como "Previa cita". Cada cambio actualiza el inicio, la página de la sucursal y los datos para Google.
+    description: Los domingos se muestran siempre como "Previa cita". Cada cambio actualiza la tarjeta de la sucursal, el pie y los datos para Google.
     fields:
       - name: masaya
         label: "Sucursal de Masaya"
@@ -441,7 +441,7 @@ content:
           - name: como_llegar
             label: Cómo llegar (referencias)
             type: text
-            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la página de la sucursal."
+            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la tarjeta de la sucursal."
           - name: mapa
             label: Búsqueda del mapa
             type: string
@@ -470,7 +470,7 @@ content:
           - name: resenas
             label: Enlace para dejar reseña en Google
             type: string
-            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra.
+            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra en la tarjeta de la sucursal.
       - name: diriomo
         label: "Sucursal de Diriomo"
         type: object
@@ -491,7 +491,7 @@ content:
           - name: como_llegar
             label: Cómo llegar (referencias)
             type: text
-            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la página de la sucursal."
+            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la tarjeta de la sucursal."
           - name: mapa
             label: Búsqueda del mapa
             type: string
@@ -520,7 +520,7 @@ content:
           - name: resenas
             label: Enlace para dejar reseña en Google
             type: string
-            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra.
+            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra en la tarjeta de la sucursal.
 
   - name: equipo
     label: "Equipo · Nosotros"
