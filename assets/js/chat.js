@@ -17,7 +17,7 @@
   var WA_FALLBACK = WA_OK.test(cfg.whatsappUrl || '') ? cfg.whatsappUrl : '';
   var STORE = 'opto-chat-v1';
   var DEFAULT_MAX = 500;
-  var MOBILE = window.matchMedia('(max-width: 879.98px)');
+  var MOBILE = window.matchMedia('(max-width: 899.98px)');
   var COARSE = window.matchMedia('(pointer: coarse)');
 
   // ---------- utilidades ----------

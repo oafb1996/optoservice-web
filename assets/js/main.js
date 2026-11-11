@@ -2,47 +2,133 @@
 (function () {
   'use strict';
 
-  var MOBILE = window.matchMedia('(max-width: 879.98px)');
-  var nav = document.querySelector('[data-nav]');
-  var burger = document.querySelector('[data-menu-toggle]');
-
-  // Navegación: fondo de vidrio al hacer scroll
-  function onScroll() {
-    nav.classList.toggle('is-scrolled', window.scrollY > 24);
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  var WHATSAPP = '50584024868';
+  var MOBILE = window.matchMedia('(max-width: 899.98px)');
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Menú móvil
+  var burger = document.querySelector('[data-menu-toggle]');
+  var menu = document.getElementById('nav-menu');
   function setMenu(open) {
-    nav.classList.toggle('menu-open', open);
+    menu.hidden = !open;
     burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
   }
-  burger.addEventListener('click', function () {
-    setMenu(!nav.classList.contains('menu-open'));
-  });
-  document.querySelectorAll('[data-menu-close]').forEach(function (a) {
+  burger.addEventListener('click', function () { setMenu(menu.hidden); });
+  menu.querySelectorAll('a').forEach(function (a) {
     a.addEventListener('click', function () { setMenu(false); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !menu.hidden) { setMenu(false); burger.focus(); }
   });
   MOBILE.addEventListener('change', function () { setMenu(false); });
 
-  // Preguntas frecuentes: un panel abierto a la vez
-  var faqButtons = Array.prototype.slice.call(document.querySelectorAll('[data-faq-toggle]'));
-  function setFaq(btn, open) {
-    var panel = document.getElementById(btn.getAttribute('aria-controls'));
-    btn.setAttribute('aria-expanded', String(open));
-    btn.querySelector('[data-faq-icon]').style.transform = open ? 'rotate(45deg)' : 'none';
-    panel.style.maxHeight = open ? '460px' : '0px';
-  }
-  faqButtons.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var open = btn.getAttribute('aria-expanded') !== 'true';
-      faqButtons.forEach(function (b) { setFaq(b, b === btn && open); });
+  // Preguntas frecuentes: una abierta a la vez (para navegadores sin <details name>)
+  var faqs = Array.prototype.slice.call(document.querySelectorAll('details[name="faq"]'));
+  faqs.forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) faqs.forEach(function (o) { if (o !== d && o.open) o.open = false; });
     });
   });
 
-  // Formulario de afiliación: se envía por correo con Web3Forms (https://web3forms.com).
-  // La clave pública (data-access-key en el <form>) hace que llegue a afiliaciones@optoservicenic.com.
+  // ===== Agendar cita: 3 pasos que arman el mensaje de WhatsApp =====
+  // Sin JavaScript (o sin <dialog>), los botones "Agendar" abren WhatsApp directamente.
+  var sheet = document.querySelector('[data-sheet]');
+  if (sheet && typeof sheet.showModal === 'function') {
+    var sForm = sheet.querySelector('[data-sheet-form]');
+    var steps = sheet.querySelectorAll('[data-step]');
+    var bars = sheet.querySelectorAll('.sheet-bars span');
+    var stepLabel = sheet.querySelector('[data-sheet-step]');
+    var title = sheet.querySelector('[data-sheet-title]');
+    var nextBtn = sheet.querySelector('[data-sheet-next]');
+    var backBtn = sheet.querySelector('[data-sheet-back]');
+    var sendLink = sheet.querySelector('[data-sheet-send]');
+    var sendNote = sheet.querySelector('[data-sheet-note]');
+    var TITLES = ['¿Qué necesitas?', '¿En cuál sucursal?', '¿Cuándo te viene bien?'];
+    var REQUIRED = ['servicio', 'sucursal'];
+    var step = 1;
+    var opener = null;
+
+    var value = function (name) {
+      var el = sForm.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : null;
+    };
+    var message = function () {
+      var svc = value('servicio'), br = value('sucursal'), when = value('cuando');
+      var name = (sForm.elements.nombre.value || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      var msg = '¡Hola Opto Service! ' + (svc && svc !== 'no-seguro'
+        ? 'Quisiera agendar una cita para: ' + svc
+        : 'Quisiera agendar una cita, pero no estoy seguro de qué servicio necesito');
+      if (br) msg += ', en la sucursal de ' + br;
+      msg += '.';
+      if (when) msg += ' ' + when;
+      if (name) msg += ' Mi nombre es ' + name + '.';
+      return msg;
+    };
+    var canNext = function () {
+      return step > REQUIRED.length || value(REQUIRED[step - 1]) !== null;
+    };
+    var render = function (focusTitle) {
+      steps.forEach(function (el) { el.hidden = +el.getAttribute('data-step') !== step; });
+      bars.forEach(function (b, i) { b.classList.toggle('is-done', i < step); });
+      stepLabel.textContent = 'Paso ' + step + ' de 3';
+      title.textContent = TITLES[step - 1];
+      nextBtn.hidden = step === 3;
+      nextBtn.setAttribute('aria-disabled', String(!canNext()));
+      backBtn.hidden = step === 1;
+      sendLink.hidden = sendNote.hidden = step !== 3;
+      sendLink.href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(message());
+      if (focusTitle) title.focus();
+    };
+
+    var open = function (from) {
+      opener = from || null;
+      sForm.reset();
+      step = 1;
+      setMenu(false);
+      if (window.OptoChat && typeof window.OptoChat.close === 'function') window.OptoChat.close();
+      render(false);
+      sheet.showModal();
+      title.focus();
+    };
+    var close = function () { if (sheet.open) sheet.close(); };
+
+    document.querySelectorAll('[data-agendar]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button > 0) return; // abrir en otra pestaña: WhatsApp directo
+        e.preventDefault();
+        open(a);
+      });
+    });
+    sForm.addEventListener('change', function () { render(false); });
+    sForm.addEventListener('input', function () { render(false); });
+    sForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (step < 3) nextBtn.click(); else sendLink.click();
+    });
+    nextBtn.addEventListener('click', function () {
+      if (!canNext()) {
+        var first = steps[step - 1].querySelector('input');
+        if (first) first.focus();
+        return;
+      }
+      step += 1;
+      render(true);
+    });
+    backBtn.addEventListener('click', function () { step = Math.max(1, step - 1); render(true); });
+    sheet.querySelector('[data-sheet-close]').addEventListener('click', close);
+    sendLink.addEventListener('click', function () { setTimeout(close, 300); });
+    // Tocar fuera de la hoja la cierra
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) close(); });
+    sheet.addEventListener('close', function () {
+      if (opener && document.contains(opener) && opener.offsetParent !== null) opener.focus();
+      opener = null;
+    });
+  }
+
+  // ===== Formulario de afiliación =====
+  // Se envía por correo con Web3Forms (https://web3forms.com). La clave pública está en
+  // data-access-key del <form>; el correo de destino lo define la clave.
   var form = document.querySelector('[data-afil-form]');
   var success = document.querySelector('[data-afil-success]');
   var errorBox = form.querySelector('[data-afil-error]');
@@ -89,7 +175,7 @@
       });
     }).then(function () {
       form.reset();
-      form.style.display = 'none';
+      form.hidden = true;
       success.hidden = false;
       success.focus();
     }).catch(function () {
@@ -120,9 +206,7 @@
     }
   }
 
-  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Carruseles de fotos: cambian solos mientras están a la vista
+  // ===== Carruseles de fotos: cambian solos mientras están a la vista =====
   function loadSlide(img) {
     if (img.dataset.srcset) { img.srcset = img.dataset.srcset; delete img.dataset.srcset; }
     if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
@@ -132,9 +216,13 @@
     if (slides.length < 2) return;
     var current = 0, timer = null, visible = false;
     var interval = parseInt(box.getAttribute('data-interval'), 10) || 5000;
+    var outside = box.getAttribute('data-dots') === 'outside';
 
+    // Indicadores: una línea por foto (debajo de la portada, sobre la foto en las demás)
     var dots = document.createElement('div');
-    dots.className = 'carousel-dots';
+    dots.className = 'carousel-dots ' + (outside ? 'is-outside' : 'is-inside');
+    dots.setAttribute('role', 'group');
+    dots.setAttribute('aria-label', 'Fotos');
     slides.forEach(function (_, i) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -143,7 +231,7 @@
       b.addEventListener('click', function () { show(i); restart(); });
       dots.appendChild(b);
     });
-    box.appendChild(dots);
+    if (outside) box.parentNode.insertBefore(dots, box.nextSibling); else box.appendChild(dots);
 
     function show(i) {
       loadSlide(slides[i]);
@@ -189,7 +277,7 @@
     });
   });
 
-  // Asistente de chat: el código del panel se descarga solo cuando alguien lo abre
+  // ===== Asistente de chat: el código del panel se descarga solo cuando alguien lo abre =====
   var chatOpeners = document.querySelectorAll('[data-chat-open]');
   if (chatOpeners.length) {
     var chatLoading = null;
@@ -218,23 +306,4 @@
       });
     });
   }
-
-  // Aparición suave al hacer scroll
-  if (REDUCED || !('IntersectionObserver' in window)) return;
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) {
-        e.target.style.opacity = '1';
-        e.target.style.transform = 'none';
-        io.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-  document.querySelectorAll('[data-reveal]').forEach(function (el, i) {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(28px) scale(.99)';
-    el.style.transition = 'opacity .75s cubic-bezier(.22,.61,.36,1), transform .75s cubic-bezier(.22,.61,.36,1)';
-    el.style.transitionDelay = ((i % 5) * 0.07) + 's';
-    io.observe(el);
-  });
 })();

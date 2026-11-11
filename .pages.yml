@@ -79,29 +79,8 @@ content:
                 - { value: arriba, label: Arriba (caras) }
                 - { value: centro, label: Centro }
                 - { value: abajo, label: Abajo }
-      - name: servicios
-        label: Servicios (foto horizontal junto al título)
-        type: object
-        list: true
-        fields:
-          - name: imagen
-            label: Foto
-            type: image
-            required: true
-          - name: descripcion
-            label: Descripción de la foto
-            type: string
-            description: Qué se ve en la foto. Ayuda a personas con discapacidad visual y a Google.
-          - name: enfoque
-            label: Parte de la foto que siempre debe verse
-            type: select
-            options:
-              values:
-                - { value: arriba, label: Arriba (caras) }
-                - { value: centro, label: Centro }
-                - { value: abajo, label: Abajo }
       - name: examen
-        label: Examen visual (foto horizontal)
+        label: Examen visual (foto junto a la lista del examen)
         type: object
         list: true
         fields:
@@ -122,7 +101,7 @@ content:
                 - { value: centro, label: Centro }
                 - { value: abajo, label: Abajo }
       - name: nosotros
-        label: Nosotros (foto vertical)
+        label: Nosotros (foto vertical, sección azul)
         type: object
         list: true
         fields:
