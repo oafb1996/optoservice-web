@@ -17,6 +17,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:locale" content="es_NI">
+<!--comun:recursos-->
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="assets/img/icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="assets/img/icons/icon-192.png" type="image/png" sizes="192x192">
@@ -24,6 +25,9 @@
 <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/styles.css">
 <script src="assets/js/main.js" defer></script>
+<!--/comun:recursos-->
+<!-- Datos estructurados: los genera scripts/build.py con content/sucursales.json -->
+<!--datos-estructurados-->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -118,10 +122,12 @@
   ]
 }
 </script>
+<!--/datos-estructurados-->
 </head>
 <body>
 
-  <!-- ===== ENCABEZADO ===== -->
+  <!-- ===== ENCABEZADO (se repite en todas las páginas) ===== -->
+  <!--comun:cabecera-->
   <header class="site-header" data-header>
     <div class="wrap header-bar">
       <a class="brand" href="#top" aria-label="Opto Service, inicio"><img src="assets/img/logo-opto-service.png" alt="Opto Service — Óptica y Optometría Médica" width="95" height="44"></a>
@@ -151,6 +157,7 @@
       <a href="#contacto">Contacto</a>
     </nav>
   </header>
+  <!--/comun:cabecera-->
 
   <main>
   <!-- ===== PORTADA ===== -->
@@ -209,7 +216,7 @@
       </div>
       <div class="card services-list">
         <article class="service"><span class="num">01</span><div><h3>Examen visual completo</h3><p>Agudeza visual, refracción, salud ocular externa, estereopsis, visión cromática, binocularidad y acomodación. <a href="#examen">Conoce qué incluye el examen visual</a>.</p></div></article>
-        <article class="service"><span class="num">02</span><div><h3>Ortóptica y Terapia Visual</h3><p>Tratamiento de estrabismo, ambliopía (ojo perezoso) e insuficiencia de convergencia con planes personalizados.</p></div></article>
+        <article class="service"><span class="num">02</span><div><h3>Ortóptica y Terapia Visual</h3><p>Tratamiento de estrabismo, ambliopía (ojo perezoso) e insuficiencia de convergencia con planes personalizados.<span data-requiere="terapia-visual"> <a href="/terapia-visual">Conoce la terapia visual</a>.</span></p></div></article>
         <article class="service"><span class="num">03</span><div><h3>Optometría pediátrica</h3><p>Evaluación visual para niñas y niños, con un trato paciente y adaptado a cada edad.</p></div></article>
         <article class="service"><span class="num">04</span><div><h3>Lentes oftálmicos</h3><p>Monturas y lentes graduados a tu medida, con asesoría honesta según tu estilo de vida.</p></div></article>
         <article class="service"><span class="num">05</span><div><h3>Lentes de contacto</h3><p>Adaptación y control de lentes de contacto, con seguimiento para una visión cómoda y segura.</p></div></article>
@@ -267,6 +274,9 @@
           <div class="pillar"><span class="num">02</span><h3>Terapia visual especializada</h3><p>Estrabismo, ambliopía e insuficiencia de convergencia.</p></div>
           <div class="pillar"><span class="num">03</span><h3>Trato honesto y moderno</h3><p>Te explicamos todo con claridad para que decidas con confianza.</p></div>
         </div>
+        <!-- Equipo: se administra en Pages CMS (Equipo · Nosotros). TODO: nombres, títulos y fotos del equipo. -->
+        <!--equipo-->
+        <!--/equipo-->
       </div>
     </div>
   </section>
@@ -303,6 +313,7 @@
             <!--fotos:masaya-->
             <!--/fotos:masaya-->
           </div>
+          <!--sucursal:masaya-->
           <iframe class="branch-map" src="https://maps.google.com/maps?q=Opto%20Service%2C%20Cuerpo%20de%20bomberos%2040%20metros%20sur%2C%20Avenida%20central%2C%20Masaya%2C%20Nicaragua&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de la sucursal de Masaya"></iframe>
           <div class="branch-body">
             <div class="branch-head"><h3>Masaya</h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>
@@ -317,12 +328,14 @@
               <a class="btn btn-outline btn-sm" href="https://g.page/r/CeLkjb6qK5vxEBM/review" target="_blank" rel="noopener">Déjanos tu reseña en Google<span class="sr-only"> — sucursal de Masaya</span></a>
             </div>
           </div>
+          <!--/sucursal:masaya-->
         </article>
         <article class="card branch" id="diriomo">
           <div class="branch-photo" data-carousel="diriomo" data-interval="5000" hidden>
             <!--fotos:diriomo-->
             <!--/fotos:diriomo-->
           </div>
+          <!--sucursal:diriomo-->
           <iframe class="branch-map" src="https://maps.google.com/maps?q=Opto%20Service%20Diriomo%2C%20Plaza%20Candelaria%2C%20Diriomo%2C%20Nicaragua&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de la sucursal de Diriomo"></iframe>
           <div class="branch-body">
             <div class="branch-head"><h3>Diriomo</h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>
@@ -334,6 +347,7 @@
             </dl>
             <a class="btn btn-outline btn-sm" href="https://www.google.com/maps/dir/?api=1&amp;destination=Opto%20Service%20Diriomo%2C%20Plaza%20Candelaria%2C%20Diriomo%2C%20Nicaragua" target="_blank" rel="noopener">Cómo llegar<span class="sr-only"> a la sucursal de Diriomo</span></a>
           </div>
+          <!--/sucursal:diriomo-->
         </article>
       </div>
     </div>
@@ -452,11 +466,13 @@
   </section>
   </main>
 
+  <!-- ===== PIE, BOTONES FLOTANTES Y "AGENDAR CITA" (se repiten en todas las páginas) ===== -->
+  <!--comun:pie-->
   <!-- ===== PIE DE PÁGINA ===== -->
   <footer class="site-footer">
     <div class="wrap footer-grid">
       <div class="footer-brand">
-        <img src="assets/img/logo-opto-service.png" alt="Opto Service — Óptica y Optometría Médica" width="112" height="52">
+        <img src="assets/img/logo-opto-service.png" alt="Opto Service — Óptica y Optometría Médica" width="112" height="52" loading="lazy" decoding="async">
         <p>Óptica y Optometría Médica. Un servicio honesto y cercano para cuidar la visión de toda tu familia.</p>
       </div>
       <nav class="footer-nav" aria-label="Pie de página">
@@ -473,8 +489,10 @@
       </nav>
       <div class="footer-branches">
         <div class="eyebrow">Sucursales</div>
+        <!--pie:sucursales-->
         <p><strong>Masaya</strong><br>Centro de Multiespecialidades Médicas, del cuerpo de bomberos 40m al sur.</p>
         <p><strong>Diriomo</strong><br>Plaza Candelaria, Módulo 7.</p>
+        <!--/pie:sucursales-->
         <a class="footer-wa" href="https://wa.me/50584024868?text=%C2%A1Hola%20Opto%20Service!%20Quiero%20agendar%20un%20examen%20visual.%20%C2%BFMe%20ayudan%20con%20la%20cita%3F" target="_blank" rel="noopener">WhatsApp · 8402 4868</a>
       </div>
     </div>
@@ -547,6 +565,7 @@
 
   <!--chat-config-->
   <!--/chat-config-->
+  <!--/comun:pie-->
 
 </body>
 </html>

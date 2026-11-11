@@ -54,7 +54,15 @@ class PublishedSEO(unittest.TestCase):
         self.assertEqual(canonical, ['https://optoservicenic.com/'])
         sitemap = ET.parse(self.site / 'sitemap.xml')
         urls = [node.text for node in sitemap.findall('.//{*}loc')]
-        self.assertEqual(urls, canonical)
+        # El inicio y cada página publicada (sin noindex); nunca borradores, 404 ni vista previa
+        expected = []
+        for path in sorted(self.site.glob('*.html'), key=lambda f: f.name != 'index.html'):
+            page = Page(path.read_text())
+            if any('noindex' in a.get('content', '') for tag, a in page.tags if tag == 'meta'):
+                continue
+            expected += [a['href'] for tag, a in page.tags if tag == 'link' and a.get('rel') == 'canonical']
+        self.assertEqual(urls[0], canonical[0])
+        self.assertEqual(urls, expected)
         robots = (self.site / 'robots.txt').read_text()
         self.assertIn('Sitemap: https://optoservicenic.com/sitemap.xml', robots)
         self.assertNotIn('Disallow:', robots)
@@ -103,6 +111,86 @@ class PublishedSEO(unittest.TestCase):
         self.assertEqual(by_city['Masaya']['openingHoursSpecification'][1]['closes'], '15:00')
         self.assertEqual(by_city['Diriomo']['openingHoursSpecification'][1]['opens'], '08:00')
         self.assertEqual(by_city['Diriomo']['openingHoursSpecification'][1]['closes'], '14:00')
+
+
+
+class OtherPages(unittest.TestCase):
+    """Páginas fuera del inicio (paginas/*.html): encabezado y pie compartidos, borradores y 404."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.temp.cleanup)
+        cls.site = Path(cls.temp.name) / 'site'
+        subprocess.run([sys.executable, str(ROOT / 'scripts/build.py'), '--out', str(cls.site)],
+                       cwd=ROOT, check=True, capture_output=True)
+        cls.pages = {f.name: Page(f.read_text()) for f in cls.site.glob('*.html') if f.name != 'vista-previa.html'}
+
+    @staticmethod
+    def meta(page, name):
+        return next((a.get('content', '') for tag, a in page.tags if tag == 'meta' and a.get('name') == name), None)
+
+    def test_each_page_has_title_h1_and_shared_layout(self):
+        self.assertIn('404.html', self.pages)
+        self.assertIn('terapia-visual.html', self.pages)
+        for name, page in self.pages.items():
+            with self.subTest(name):
+                self.assertEqual(sum(tag == 'h1' for tag, _ in page.tags), 1)
+                self.assertTrue(any(tag == 'header' for tag, _ in page.tags))
+                self.assertTrue(any(tag == 'footer' for tag, _ in page.tags))
+                self.assertTrue(any(tag == 'dialog' for tag, _ in page.tags), 'falta la hoja de Agendar cita')
+
+    def test_links_between_pages_resolve(self):
+        ids = {name: {a['id'] for _, a in page.tags if 'id' in a} for name, page in self.pages.items()}
+        for name, page in self.pages.items():
+            for tag, a in page.tags:
+                ref = a.get('href') if tag in ('a', 'link') else a.get('src') if tag in ('img', 'script') else None
+                if not ref or not ref.startswith('/') or ref.startswith('//'):
+                    continue
+                path, _, fragment = unquote(ref.split('?')[0]).partition('#')
+                target = 'index.html' if path == '/' else path.lstrip('/')
+                if not (self.site / target).is_file():
+                    target += '.html'
+                with self.subTest(page=name, ref=ref):
+                    self.assertTrue((self.site / target).is_file())
+                    if fragment:
+                        self.assertIn(fragment, ids[target])
+            if name != 'index.html':  # fuera del inicio, ningún enlace a una sección suelta (#servicios)
+                local = [a['href'] for tag, a in page.tags if tag == 'a' and a.get('href', '').startswith('#')]
+                for href in local:
+                    self.assertIn(href[1:], ids[name], f'{name}: {href}')
+
+    def test_drafts_are_noindex_unlinked_and_out_of_sitemap(self):
+        sitemap = (self.site / 'sitemap.xml').read_text()
+        for name, page in self.pages.items():
+            source = (ROOT / 'paginas' / name)
+            if not source.is_file() or '<meta name="borrador"' not in source.read_text():
+                continue
+            slug = name[:-5]
+            with self.subTest(name):
+                self.assertIn('noindex', self.meta(page, 'robots') or '')
+                self.assertTrue(any('draft-banner' in a.get('class', '') for _, a in page.tags))
+                self.assertNotIn(f'/{slug}<', sitemap)
+                for other_name, other in self.pages.items():
+                    if other_name != name:
+                        hrefs = [a.get('href', '') for tag, a in other.tags if tag == 'a']
+                        self.assertNotIn(f'/{slug}', hrefs, f'{other_name} enlaza al borrador')
+
+    def test_not_found_page_is_noindex(self):
+        self.assertIn('noindex', self.meta(self.pages['404.html'], 'robots') or '')
+
+    def test_branch_data_comes_from_content(self):
+        data = json.loads((ROOT / 'content/sucursales.json').read_text())
+        home = Page((self.site / 'index.html').read_text())
+        branches = {n['url'].split('#')[1]: n for n in home.structured[0]['@graph'] if n['@type'] == 'Optician'}
+        self.assertEqual(set(branches), set(data))
+        for sid, suc in data.items():
+            with self.subTest(sid):
+                self.assertEqual(branches[sid]['address']['streetAddress'], suc['direccion'] + '.')
+                saturday = branches[sid]['openingHoursSpecification'][1]
+                self.assertEqual((saturday['opens'], saturday['closes']), (suc['sabado']['abre'], suc['sabado']['cierra']))
+                reviews = [a for tag, a in home.tags if tag == 'a' and a.get('data-resena') == sid]
+                self.assertEqual([a['href'] for a in reviews], [suc['resenas']] if suc['resenas'] else [])
 
 
 if __name__ == '__main__':

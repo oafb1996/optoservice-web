@@ -413,3 +413,138 @@ content:
             label: Mostrar hasta
             type: date
             description: Opcional. Al día siguiente la foto deja de mostrarse sola.
+
+  - name: sucursales
+    label: Sucursales (dirección y horario)
+    type: file
+    path: content/sucursales.json
+    format: json
+    description: Los domingos se muestran siempre como "Previa cita". Cada cambio actualiza la tarjeta de la sucursal, el pie y los datos para Google.
+    fields:
+      - name: masaya
+        label: "Sucursal de Masaya"
+        type: object
+        fields:
+          - name: direccion
+            label: Dirección
+            type: string
+            required: true
+            description: Igual que en Google, Facebook e Instagram. Se usa en la web y en los datos para Google.
+          - name: localidad
+            label: Ciudad
+            type: string
+            required: true
+          - name: departamento
+            label: Departamento
+            type: string
+            required: true
+          - name: como_llegar
+            label: Cómo llegar (referencias)
+            type: text
+            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la tarjeta de la sucursal."
+          - name: mapa
+            label: Búsqueda del mapa
+            type: string
+            required: true
+            description: Lo que se busca en Google Maps para el mapa y el botón "Cómo llegar".
+          - name: lunes_viernes
+            label: Lunes a viernes
+            type: object
+            fields:
+              - { name: abre, label: "Abre (HH:MM, 24 h)", type: string, required: true }
+              - { name: cierra, label: "Cierra (HH:MM, 24 h)", type: string, required: true }
+          - name: sabado
+            label: Sábado
+            type: object
+            fields:
+              - { name: abre, label: "Abre (HH:MM, 24 h)", type: string, required: true }
+              - { name: cierra, label: "Cierra (HH:MM, 24 h)", type: string, required: true }
+          - name: latitud
+            label: Latitud
+            type: string
+            description: "Opcional. Del pin del Perfil de Empresa en Google. Ej.: 11.97"
+          - name: longitud
+            label: Longitud
+            type: string
+            description: "Opcional. Ej.: -86.09"
+          - name: resenas
+            label: Enlace para dejar reseña en Google
+            type: string
+            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra en la tarjeta de la sucursal.
+      - name: diriomo
+        label: "Sucursal de Diriomo"
+        type: object
+        fields:
+          - name: direccion
+            label: Dirección
+            type: string
+            required: true
+            description: Igual que en Google, Facebook e Instagram. Se usa en la web y en los datos para Google.
+          - name: localidad
+            label: Ciudad
+            type: string
+            required: true
+          - name: departamento
+            label: Departamento
+            type: string
+            required: true
+          - name: como_llegar
+            label: Cómo llegar (referencias)
+            type: text
+            description: "Opcional. Ej.: frente a…, a una cuadra de… Se muestra en la tarjeta de la sucursal."
+          - name: mapa
+            label: Búsqueda del mapa
+            type: string
+            required: true
+            description: Lo que se busca en Google Maps para el mapa y el botón "Cómo llegar".
+          - name: lunes_viernes
+            label: Lunes a viernes
+            type: object
+            fields:
+              - { name: abre, label: "Abre (HH:MM, 24 h)", type: string, required: true }
+              - { name: cierra, label: "Cierra (HH:MM, 24 h)", type: string, required: true }
+          - name: sabado
+            label: Sábado
+            type: object
+            fields:
+              - { name: abre, label: "Abre (HH:MM, 24 h)", type: string, required: true }
+              - { name: cierra, label: "Cierra (HH:MM, 24 h)", type: string, required: true }
+          - name: latitud
+            label: Latitud
+            type: string
+            description: "Opcional. Del pin del Perfil de Empresa en Google. Ej.: 11.97"
+          - name: longitud
+            label: Longitud
+            type: string
+            description: "Opcional. Ej.: -86.09"
+          - name: resenas
+            label: Enlace para dejar reseña en Google
+            type: string
+            description: Del Perfil de Empresa (Leer reseñas → Obtener más reseñas). Si está vacío, el botón no se muestra en la tarjeta de la sucursal.
+
+  - name: equipo
+    label: "Equipo · Nosotros"
+    type: file
+    path: content/equipo.json
+    format: json
+    fields:
+      - name: equipo
+        label: Personas del equipo
+        type: object
+        list: true
+        description: Se muestran en este orden en la sección Nosotros. Si no hay nadie, la parte del equipo no se muestra.
+        fields:
+          - { name: activo, label: Mostrar en la web, type: boolean, default: true }
+          - { name: nombre, label: Nombre, type: string, required: true }
+          - name: titulo
+            label: Título
+            type: string
+            description: "Ej.: Licenciada en Optometría"
+          - name: especialidad
+            label: Especialidad
+            type: string
+            description: "Ej.: Terapia visual y optometría pediátrica"
+          - name: foto
+            label: Foto
+            type: image
+            description: Cuadrada o vertical, con la cara arriba al centro.

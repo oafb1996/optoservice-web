@@ -10,6 +10,12 @@
    recortadas o sin usar), las promociones con su estado y cada foto recortada
    como se verá en celular, tablet y computadora (no se enlaza desde la página
    ni la indexa Google).
+5. Inserta las sucursales (content/sucursales.json) en el inicio, el pie y los datos estructurados.
+6. Genera las demás páginas desde paginas/ (terapia-visual.html, 404.html). El encabezado, el pie y la hoja de
+   "Agendar cita" se copian de index.html, así hay una sola versión de cada uno.
+   Una página con <meta name="borrador"> se publica con noindex y un aviso, fuera del sitemap y sin
+   enlaces desde las demás (los enlaces con data-requiere="<página>" se quitan).
+7. Genera sitemap.xml con las páginas publicadas.
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -36,10 +42,16 @@ except ImportError:
     pass
 
 ROOT = Path(__file__).resolve().parent.parent
-EXCLUDE = {'.git', '.github', '.gitignore', '.pages.yml', 'scripts', 'content', 'docs', '_site', 'README.md', 'MEJORAS.md'}
+EXCLUDE = {'paginas', '.git', '.github', '.gitignore', '.pages.yml', 'scripts', 'content', 'docs', '_site', 'README.md', 'MEJORAS.md'}
 WIDTHS = (480, 800, 1200)
 WHATSAPP = '50584024868'
 NICARAGUA = timezone(timedelta(hours=-6))
+DOMINIO = 'https://optoservicenic.com'  # el mismo de CNAME, canonical y datos estructurados
+# Sucursales: están en el inicio (/#masaya, /#diriomo); los datos están en content/sucursales.json
+SUCURSALES = {'masaya': 'Masaya', 'diriomo': 'Diriomo'}
+TELEFONO = '+50584024868'
+REDES = ['https://instagram.com/optoservicenic', 'https://facebook.com/profile.php?id=100092434450811',
+         'https://tiktok.com/@optoservice']
 MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
          'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
@@ -569,7 +581,7 @@ def load_json(name):
     return data
 
 
-def version_assets(out, page):
+def version_assets(out, pages):
     """Agrega a cada script y estilo una huella de su contenido (archivo.js?v=a1b2c3d4).
 
     GitHub Pages deja que el navegador guarde los archivos 10 minutos (los celulares, a
@@ -588,16 +600,244 @@ def version_assets(out, page):
         path.write_text(text.replace(reference, f'{reference[:-1]}?v={stamp(target)}{reference[-1]}'), encoding='utf-8')
 
     assets = out / 'assets'
-    point(assets / 'js' / 'chat.js', "'assets/css/chat.css'", assets / 'css' / 'chat.css')
-    point(assets / 'js' / 'main.js', "'assets/js/chat.js'", assets / 'js' / 'chat.js')
-    for reference, target in (('href="assets/css/styles.css"', assets / 'css' / 'styles.css'),
-                              ('src="assets/js/main.js"', assets / 'js' / 'main.js')):
-        if page.count(reference) != 1:
-            warn(f'index.html: no se encontró {reference}; no se le puso versión')
+    point(assets / 'js' / 'chat.js', "'/assets/css/chat.css'", assets / 'css' / 'chat.css')
+    point(assets / 'js' / 'main.js', "'/assets/js/chat.js'", assets / 'js' / 'chat.js')
+    stamps = {'css/styles.css': stamp(assets / 'css' / 'styles.css'), 'js/main.js': stamp(assets / 'js' / 'main.js')}
+    result = {}
+    for name, page in pages.items():
+        for rel, st in stamps.items():
+            pattern = r'((?:href|src)="/?assets/%s)"' % re.escape(rel)
+            if len(re.findall(pattern, page)) != 1:
+                warn(f'{name}: no se encontró assets/{rel}; no se le puso versión')
+                continue
+            page = re.sub(pattern, r'\1?v=%s"' % st, page)
+        build_id = hashlib.sha1((page + stamps['js/main.js']).encode()).hexdigest()[:8]
+        result[name] = page.replace('<meta name="theme-color"', f'<meta name="build" content="{build_id}">\n<meta name="theme-color"', 1)
+    return result
+
+
+# ===== Sucursales, equipo y páginas =====
+
+def hora(value, where):
+    """'08:30' -> (datetime.time, '8:30am'); None si no es una hora válida."""
+    m = re.fullmatch(r'([01]?\d|2[0-3]):([0-5]\d)', text(value))
+    if not m:
+        warn(f'hora no válida "{text(value)}" en {where}')
+        return None
+    h, mi = int(m.group(1)), m.group(2)
+    return f'{h:02d}:{mi}', f'{(h - 1) % 12 + 1}:{mi}{"am" if h < 12 else "pm"}'
+
+
+def load_sucursales():
+    """Datos de cada sucursal (content/sucursales.json), validados. Sin datos válidos, la compilación se detiene."""
+    data = load_json('sucursales.json')
+    out = {}
+    for sid, nombre in SUCURSALES.items():
+        raw = data.get(sid) if isinstance(data.get(sid), dict) else {}
+        where = f'content/sucursales.json ({nombre})'
+        s = {'id': sid, 'nombre': nombre, 'url': f'{DOMINIO}/#{sid}'}
+        for campo in ('direccion', 'localidad', 'departamento', 'mapa'):
+            s[campo] = text(raw.get(campo))
+            if not s[campo]:
+                sys.exit(f'ERROR: falta "{campo}" en {where}')
+        s['como_llegar'] = text(raw.get('como_llegar'))
+        s['horario'] = []
+        for campo, dias, etiqueta in (('lunes_viernes', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 'Lunes a Viernes'),
+                                      ('sabado', ['Saturday'], 'Sábado')):
+            rango = raw.get(campo) if isinstance(raw.get(campo), dict) else {}
+            abre, cierra = hora(rango.get('abre'), f'{where}, {etiqueta}'), hora(rango.get('cierra'), f'{where}, {etiqueta}')
+            if not abre or not cierra:
+                sys.exit(f'ERROR: horario de {etiqueta} incompleto en {where}')
+            s['horario'].append({'etiqueta': etiqueta, 'dias': dias, 'abre': abre, 'cierra': cierra})
+        s['geo'] = None
+        lat, lon = text(raw.get('latitud')), text(raw.get('longitud'))
+        if lat or lon:
+            try:
+                la, lo = float(lat), float(lon)
+                if not (10 <= la <= 15.5 and -88 <= lo <= -82.5):  # Nicaragua
+                    raise ValueError
+                s['geo'] = (la, lo)
+            except ValueError:
+                warn(f'coordenadas no válidas en {where}; se omiten')
+        s['resenas'] = text(raw.get('resenas'))
+        if s['resenas'] and not re.fullmatch(r'https://[^\s"<>\']+', s['resenas']):
+            warn(f'enlace de reseñas no válido en {where}; se omite')
+            s['resenas'] = ''
+        s['lugar'] = f'{s["localidad"]}, {s["departamento"]}' if s['localidad'] != s['departamento'] else s['localidad']
+        s['mapa_src'] = 'https://maps.google.com/maps?q=' + urllib.parse.quote(s['mapa'], safe='') + '&z=15&output=embed'
+        s['direcciones'] = 'https://www.google.com/maps/dir/?api=1&destination=' + urllib.parse.quote(s['mapa'], safe='')
+        out[sid] = s
+    return out
+
+
+def horario_dl(s):
+    lines = [f'<dt>{h["etiqueta"]}</dt><dd>{h["abre"][1]} – {h["cierra"][1]}</dd>' for h in s['horario']]
+    return lines + ['<dt>Domingo</dt><dd>Previa cita</dd>']
+
+
+def horario_texto(s):
+    partes = [f'{h["etiqueta"].lower() if i else h["etiqueta"]}, de {h["abre"][1]} a {h["cierra"][1]}'
+              for i, h in enumerate(s['horario'])]
+    return '; '.join(partes) + '. Los domingos atendemos previa cita.'
+
+
+def optician(s):
+    """Datos para Google de una sucursal. El @id y la url son el ancla de su tarjeta en el inicio."""
+    node = {
+        '@type': 'Optician',
+        '@id': s['url'],
+        'name': f'Opto Service — {s["nombre"]}',
+        'url': s['url'],
+        'parentOrganization': {'@id': f'{DOMINIO}/#organizacion'},
+        'telephone': TELEFONO,
+        'address': {'@type': 'PostalAddress', 'streetAddress': f'{s["direccion"]}.', 'addressLocality': s['localidad'],
+                    'addressRegion': s['departamento'], 'addressCountry': 'NI'},
+        'openingHoursSpecification': [
+            {'@type': 'OpeningHoursSpecification', 'dayOfWeek': h['dias'] if len(h['dias']) > 1 else h['dias'][0],
+             'opens': h['abre'][0], 'closes': h['cierra'][0]} for h in s['horario']],
+        'description': 'Los domingos atendemos previa cita.',
+    }
+    if s['geo']:
+        node['geo'] = {'@type': 'GeoCoordinates', 'latitude': s['geo'][0], 'longitude': s['geo'][1]}
+    return node
+
+
+def jsonld(nodes):
+    organization = {
+        '@type': 'Organization', '@id': f'{DOMINIO}/#organizacion', 'name': 'Opto Service', 'url': f'{DOMINIO}/',
+        'logo': f'{DOMINIO}/assets/img/logo-opto-service.png', 'telephone': TELEFONO, 'sameAs': REDES,
+    }
+    graph = {'@context': 'https://schema.org', '@graph': [organization] + nodes}
+    return json.dumps(graph, ensure_ascii=False, indent=2).replace('<', '\\u003c')
+
+
+def render_branch_card(s):
+    """Mapa y datos de la tarjeta de una sucursal en el inicio."""
+    return ([f'<iframe class="branch-map" src="{attr(s["mapa_src"])}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" '
+             f'title="Mapa de la sucursal de {s["nombre"]}"></iframe>',
+             '<div class="branch-body">',
+             f'  <div class="branch-head"><h3>{s["nombre"]}</h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>',
+             f'  <p class="branch-addr">{html.escape(s["direccion"])}.</p>']
+            + ([f'  <p class="branch-ref">{html.escape(s["como_llegar"])}</p>'] if s['como_llegar'] else [])
+            + ['  <dl class="hours">']
+            + [f'    {line}' for line in horario_dl(s)]
+            + ['  </dl>',
+               '  <div class="branch-actions">',
+               f'    <a class="btn btn-outline btn-sm" href="{attr(s["direcciones"])}" target="_blank" rel="noopener" data-direcciones="{s["id"]}">'
+               f'Cómo llegar<span class="sr-only"> a la sucursal de {s["nombre"]}</span></a>']
+            + ([f'    <a class="btn btn-outline btn-sm" href="{attr(s["resenas"])}" target="_blank" rel="noopener" data-resena="{s["id"]}">'
+                f'Déjanos tu reseña en Google<span class="sr-only"> sobre la sucursal de {s["nombre"]}</span></a>'] if s['resenas'] else [])
+            + ['  </div>',
+               '</div>'])
+
+
+def render_footer_branches(sucs):
+    return [f'<p><strong><a href="#{s["id"]}">{s["nombre"]}</a></strong><br>{html.escape(s["direccion"])}.</p>' for s in sucs.values()]
+
+
+def render_team(items, optimize):
+    """Tarjetas del equipo (content/equipo.json). Sin personas con nombre, no se muestra nada."""
+    cards = []
+    for i, p in enumerate(items if isinstance(items, list) else [], 1):
+        if not isinstance(p, dict) or p.get('activo') is False:
             continue
-        page = page.replace(reference, f'{reference[:-1]}?v={stamp(target)}"')
-    build_id = hashlib.sha1((page + stamp(assets / 'js' / 'main.js')).encode()).hexdigest()[:8]
-    return page.replace('<meta name="theme-color"', f'<meta name="build" content="{build_id}">\n<meta name="theme-color"', 1)
+        nombre, titulo, especialidad = text(p.get('nombre')), text(p.get('titulo')), text(p.get('especialidad'))
+        if not nombre:
+            warn(f'la persona {i} del equipo no tiene nombre; no se muestra')
+            continue
+        img = optimize(p['foto']) if text(p.get('foto')) else None
+        card = ['  <article class="member">']
+        if img:
+            card.append('    <div class="member-photo">' + picture(
+                img, '(max-width: 599px) 40vw, 160px',
+                f'alt="{attr(nombre)}" loading="lazy" decoding="async" style="object-position:50% 25%"') + '</div>')
+        card.append(f'    <h3>{html.escape(nombre)}</h3>')
+        if titulo:
+            card.append(f'    <p class="member-title">{html.escape(titulo)}</p>')
+        if especialidad:
+            card.append(f'    <p>{html.escape(especialidad)}</p>')
+        card.append('  </article>')
+        cards.extend(card)
+    if not cards:
+        return []
+    return ['<div class="team-head eyebrow">Nuestro equipo</div>', '<div class="team">'] + cards + ['</div>']
+
+
+def extract_block(page, name):
+    match = re.search(r'<!--%s-->\n(.*?)^ *<!--/%s-->' % (re.escape(name), re.escape(name)), page, re.S | re.M)
+    if not match:
+        sys.exit(f'ERROR: falta el marcador <!--{name}--> en index.html')
+    return match.group(1)
+
+
+def absolutize(fragment):
+    """Enlaces de index.html para usarlos en otra página: #seccion -> /#seccion y assets/... -> /assets/..."""
+    fragment = fragment.replace('href="#top"', 'href="/"')
+    fragment = re.sub(r'href="#([A-Za-z][\w-]*)"', r'href="/#\1"', fragment)
+    return re.sub(r'\b(href|src)="(?![a-z][a-z0-9+.-]*:|/|#)', r'\1="/', fragment)
+
+
+def fill_common(page, comunes, name):
+    for block, content in comunes.items():
+        pattern = re.compile(r'^( *)<!--%s-->\n *<!--/%s-->\n' % (block, block), re.M)
+        if not pattern.search(page):
+            sys.exit(f'ERROR: falta el marcador <!--{block}--> vacío en paginas/{name}')
+        page = pattern.sub(lambda m: content, page, count=1)
+    return page
+
+
+def mark_draft(page):
+    """Páginas en borrador: noindex y aviso visible. Devuelve (página, motivo o None)."""
+    match = re.search(r'<meta name="borrador" content="([^"]*)">\n?', page)
+    if not match:
+        return page, None
+    motivo = match.group(1) or 'Borrador'
+    page = page.replace(match.group(0), '<meta name="robots" content="noindex, nofollow">\n', 1)
+    page = page.replace('<main>', '<main>\n  <div class="draft-banner" role="note"><strong>Borrador:</strong> '
+                        f'{html.escape(motivo)}. Esta página no aparece en Google ni está enlazada; no la compartas todavía.</div>', 1)
+    return page, motivo
+
+
+def drop_links(page, drafts):
+    """Quita los enlaces hacia páginas en borrador: el <a> o <span> que lleva data-requiere="<página>"."""
+    for name in drafts:
+        page = re.sub(r'<(a|span) [^>]*data-requiere="%s"[^>]*>.*?</\1>' % re.escape(name), '', page, flags=re.S)
+    return page
+
+
+def write_sitemap(out, pages):
+    """sitemap.xml con la URL canónica de cada página publicable (sin noindex).
+
+    Los anclajes (#masaya) no son páginas distintas. La vista previa y los borradores quedan
+    fuera y conservan su meta noindex (no bloquearlos en robots.txt: el buscador necesita leer
+    esa directiva).
+    """
+    urls = []
+    for name, page in pages.items():
+        if re.search(r'<meta name="robots" content="[^"]*noindex', page):
+            continue
+        canonical = re.search(r'<link rel="canonical" href="([^"]+)">', page)
+        if not canonical:
+            raise ValueError(f'{name} debe declarar su URL canónica para el sitemap')
+        urls.append(html.unescape(canonical.group(1)))
+    namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+    ET.register_namespace('', namespace)
+    sitemap = ET.Element(f'{{{namespace}}}urlset')
+    for loc in urls:
+        ET.SubElement(ET.SubElement(sitemap, f'{{{namespace}}}url'), f'{{{namespace}}}loc').text = loc
+    ET.ElementTree(sitemap).write(out / 'sitemap.xml', encoding='utf-8', xml_declaration=True)
+
+
+def apply_slot(page, slot, slides):
+    """Pone las fotos de un espacio (y su velocidad) en una página que tiene su marcador."""
+    visibles, interval, cfg = slides[slot]
+    page = re.sub(r'(data-carousel="%s" data-interval=")\d+"' % slot, r'\g<1>%d"' % interval, page)
+    if visibles:
+        page = replace_block(page, f'fotos:{slot}', render_slides(slot, visibles))
+        page = re.sub(r'(data-carousel="%s"[^>]*?) hidden>' % slot, r'\1>', page)
+    elif cfg.get('opcional'):
+        page = replace_block(page, f'fotos:{slot}', [])
+    return page
 
 
 def main():
@@ -622,7 +862,8 @@ def main():
     optimize = Optimizer(out)
     page = (ROOT / 'index.html').read_text(encoding='utf-8')
 
-    fotos = {}
+    # Fotos de cada espacio
+    fotos, slides = {}, {}
     for slot, cfg in SLOTS.items():
         data = load_json(cfg['archivo'])
         items = slide_items(slot, data.get(cfg['lista']), optimize, today)
@@ -631,50 +872,57 @@ def main():
         segundos = data.get('segundos')
         if isinstance(segundos, bool) or not isinstance(segundos, (int, float)) or not math.isfinite(segundos):
             segundos = 5
-        interval = int(min(max(segundos, 3), 20) * 1000)
-        page = re.sub(r'(data-carousel="%s" data-interval=")\d+"' % slot, r'\g<1>%d"' % interval, page)
-        if visibles:
-            page = replace_block(page, f'fotos:{slot}', render_slides(slot, visibles))
-            page = re.sub(r'(data-carousel="%s"[^>]*?) hidden>' % slot, r'\1>', page)
-        elif cfg.get('opcional'):
-            page = replace_block(page, f'fotos:{slot}', [])
-        else:
+        slides[slot] = (visibles, int(min(max(segundos, 3), 20) * 1000), cfg)
+        if not visibles and not cfg.get('opcional'):
             warn(f'"{cfg["titulo"]}" no tiene fotos para hoy; se deja la foto por defecto')
+        page = apply_slot(page, slot, slides)
 
+    # Promociones
     promos_raw = load_json('promociones.json').get('promociones')
     cards = render_promos(promos_raw, optimize, today)
     page = replace_block(page, 'promociones', cards)
     if cards:
         page = page.replace('data-promos hidden', 'data-promos').replace(' data-promo-link hidden', ' data-promo-link')
 
+    # Asistente de chat
     chat = render_chat(load_json('chat.json'))
     if chat:
         for name, lines in chat.items():
             page = replace_block(page, name, lines)
 
+    # Sucursales, equipo y datos estructurados
+    sucs = load_sucursales()
+    for sid, suc in sucs.items():
+        page = replace_block(page, f'sucursal:{sid}', render_branch_card(suc))
+    page = replace_block(page, 'pie:sucursales', render_footer_branches(sucs))
+    page = replace_block(page, 'equipo', render_team(load_json('equipo.json').get('equipo'), optimize))
+    page = replace_block(page, 'datos-estructurados', ['<script type="application/ld+json">',
+                                                       jsonld([optician(s) for s in sucs.values()]), '</script>'])
+
+    # Demás páginas: comparten encabezado, pie y recursos con el inicio
+    comunes = {name: absolutize(extract_block(page, name)) for name in ('comun:recursos', 'comun:cabecera', 'comun:pie')}
+    pages, drafts = {'index.html': page}, []
+    for src in sorted((ROOT / 'paginas').glob('*.html')):
+        other, motivo = mark_draft(src.read_text(encoding='utf-8'))
+        if motivo:
+            drafts.append(src.stem)
+            warn(f'{src.name} está en borrador ({motivo}): se publica con noindex y sin enlaces')
+        pages[src.name] = fill_common(other, comunes, src.name)
+    pages = {name: drop_links(p, drafts) for name, p in pages.items()}
+
     notices = collect_notices(fotos, promos_raw, optimize, today)
     (out / 'vista-previa.html').write_text(
         render_preview(fotos, promo_states(promos_raw, optimize, today), notices, today), encoding='utf-8')
 
-    page = version_assets(out, page)
-    (out / 'index.html').write_text(page, encoding='utf-8')
-    # Solo URLs canónicas publicables: los anclajes no son páginas distintas.
-    # La vista previa queda fuera y conserva su meta noindex (no bloquearla
-    # en robots.txt: el buscador necesita leer esa directiva).
-    canonical = re.search(r'<link rel="canonical" href="([^"]+)">', page)
-    if not canonical:
-        raise ValueError('index.html debe declarar su URL canónica para el sitemap')
-    namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9'
-    ET.register_namespace('', namespace)
-    sitemap = ET.Element(f'{{{namespace}}}urlset')
-    url = ET.SubElement(sitemap, f'{{{namespace}}}url')
-    ET.SubElement(url, f'{{{namespace}}}loc').text = html.unescape(canonical.group(1))
-    ET.ElementTree(sitemap).write(out / 'sitemap.xml', encoding='utf-8', xml_declaration=True)
+    write_sitemap(out, pages)
+
+    for name, p in version_assets(out, pages).items():
+        (out / name).write_text(p, encoding='utf-8')
     print(f'Sitio generado en {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}: '
+          f'{len(pages)} páginas ({len(drafts)} en borrador), '
           f'{len(optimize.cache)} imágenes optimizadas, {sum(1 for c in cards if c.startswith("<article"))} promociones vigentes'
           + (', asistente de chat ACTIVO' if chat else '')
           + (f', {len(warnings)} avisos' if warnings else ''))
-
 
 if __name__ == '__main__':
     main()
