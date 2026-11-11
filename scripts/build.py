@@ -96,7 +96,7 @@ SERVICIOS = ['Examen visual completo', 'Terapia visual', 'Optometría pediátric
 # Secciones a las que puede llevar el recuadro de una foto (campo "enlace")
 SECCIONES = {'#promociones': 'Promociones', '#servicios': 'Servicios', '#examen': 'Examen visual',
              '#nosotros': 'Nosotros', '#senales': '¿Cuándo revisarte?', '#sucursales': 'Sucursales',
-             '#faq': 'Preguntas frecuentes', '#empresas': 'Para empresas', '#contacto': 'Contacto'}
+             '#faq': 'Preguntas frecuentes', '/empresas': 'Para empresas', '#contacto': 'Contacto'}
 MIN_ANCHO = 1000  # px: con menos, la foto puede verse borrosa en computadora
 MIN_VISIBLE = .5  # fracción de la foto que debe verse en cada pantalla antes de avisar
 PROMO_SIZES = '(max-width: 599px) calc(100vw - 32px), 300px'
@@ -242,6 +242,8 @@ def slide_items(slot, items, optimize, today):
         elif hasta and today > hasta:
             estado = f'vencida: se dejó de mostrar después del {fecha(hasta)}'
         enlace = text(item.get('enlace'))
+        if enlace == '#empresas':  # la sección pasó a su propia página
+            enlace = '/empresas'
         if enlace and not (enlace in SECCIONES or enlace == 'agendar'
                            or (enlace.startswith('agendar:') and enlace[8:] in SERVICIOS)):
             warn(f'enlace "{enlace}" no válido en {where}; el recuadro queda sin enlace')
@@ -723,7 +725,7 @@ def render_branch_card(s):
     return ([f'<iframe class="branch-map" src="{attr(s["mapa_src"])}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" '
              f'title="Mapa de la sucursal de {s["nombre"]}"></iframe>',
              '<div class="branch-body">',
-             f'  <div class="branch-head"><h3>{s["nombre"]}</h3><span class="eyebrow is-teal">Óptica y optometría médica</span></div>',
+             f'  <div class="branch-head"><h3>{s["nombre"]}</h3><span class="eyebrow is-teal">Óptica y Optometría Médica</span></div>',
              f'  <p class="branch-addr">{html.escape(s["direccion"])}.</p>']
             + ([f'  <p class="branch-ref">{html.escape(s["como_llegar"])}</p>'] if s['como_llegar'] else [])
             + ['  <dl class="hours">']
@@ -736,6 +738,19 @@ def render_branch_card(s):
                 f'Déjanos tu reseña en Google<span class="sr-only"> sobre la sucursal de {s["nombre"]}</span></a>'] if s['resenas'] else [])
             + ['  </div>',
                '</div>'])
+
+
+def render_contact_hours(sucs):
+    """Horario resumido del bloque "Agenda tu cita": un solo horario si todas las sucursales coinciden."""
+    lines = ['<dl class="contact-hours">']
+    for i, etiqueta in enumerate(('Lunes a viernes', 'Sábado')):
+        rangos = {sid: f'{s["horario"][i]["abre"][1]} – {s["horario"][i]["cierra"][1]}' for sid, s in sucs.items()}
+        if len(set(rangos.values())) == 1:
+            texto = next(iter(rangos.values()))
+        else:
+            texto = '<br>'.join(f'<span class="nowrap">{sucs[sid]["nombre"]}: {r}</span>' for sid, r in rangos.items())
+        lines.append(f'  <dt>{etiqueta}</dt><dd>{texto}</dd>')
+    return lines + ['  <dt>Domingo</dt><dd>Previa cita</dd>', '</dl>']
 
 
 def render_footer_branches(sucs):
@@ -941,6 +956,7 @@ def main():
     for sid, suc in sucs.items():
         page = replace_block(page, f'sucursal:{sid}', render_branch_card(suc))
     page = replace_block(page, 'pie:sucursales', render_footer_branches(sucs))
+    page = replace_block(page, 'contacto:horario', render_contact_hours(sucs))
     page = replace_block(page, 'equipo', render_team(load_json('equipo.json').get('equipo'), optimize))
     page = replace_block(page, 'datos-estructurados', ['<script type="application/ld+json">',
                                                        jsonld([optician(s) for s in sucs.values()]), '</script>'])

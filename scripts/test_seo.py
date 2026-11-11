@@ -87,7 +87,7 @@ class PublishedSEO(unittest.TestCase):
         self.assertIn('masaya', ids)
         self.assertIn('diriomo', ids)
         self.assertEqual(sum(tag == 'h1' for tag, _ in self.page.tags), 1)
-        self.assertIn('Óptica y optometría en Masaya y Diriomo</h1>', self.text)
+        self.assertIn('Óptica y Optometría en Masaya y Diriomo</h1>', self.text)
 
     def test_local_businesses_match_visible_content(self):
         self.assertEqual(len(self.page.structured), 1)
@@ -134,6 +134,9 @@ class OtherPages(unittest.TestCase):
     def test_each_page_has_title_h1_and_shared_layout(self):
         self.assertIn('404.html', self.pages)
         self.assertIn('terapia-visual.html', self.pages)
+        self.assertIn('empresas.html', self.pages)
+        self.assertTrue(any(tag == 'form' and 'data-afil-form' in a for tag, a in self.pages['empresas.html'].tags))
+        self.assertFalse(any(tag == 'form' and 'data-afil-form' in a for tag, a in self.pages['index.html'].tags))
         for name, page in self.pages.items():
             with self.subTest(name):
                 self.assertEqual(sum(tag == 'h1' for tag, _ in page.tags), 1)

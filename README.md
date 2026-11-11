@@ -2,7 +2,7 @@
 
 Sitio web de **Opto Service** — https://optoservicenic.com (Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua).
 
-Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio, con las dos sucursales, más `/terapia-visual` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos, las promociones, los datos de las sucursales y el equipo se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
+Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio, con las dos sucursales, más `/empresas` (afiliaciones), `/terapia-visual`, `/privacidad` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos, las promociones, los datos de las sucursales y el equipo se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
 
 ## Administrar fotos y promociones (gerencia)
 
@@ -24,7 +24,7 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 
 ```
 index.html                  Página de inicio (con marcadores donde se insertan fotos, promociones, sucursales y equipo)
-paginas/*.html              Otras páginas (terapia-visual, privacidad, 404); toman encabezado y pie de index.html
+paginas/*.html              Otras páginas (empresas, terapia-visual, privacidad, 404); toman encabezado y pie de index.html
 content/fotos-*.json        Fotos de cada sección (portada, examen, nosotros, sucursales)  ← lo edita Pages CMS
 content/promociones.json    Promociones del mes              ← lo edita Pages CMS
 content/sucursales.json     Dirección, horario, coordenadas y enlace de reseñas de cada sucursal  ← Pages CMS
@@ -141,7 +141,7 @@ Cada script y hoja de estilos se publica con una huella de su contenido (`main.j
 ## Datos que conviene revisar al editar
 
 - **WhatsApp / teléfono:** `50584024868` (enlaces `wa.me` y `tel:` en `index.html`, y `WHATSAPP` en `scripts/build.py`)
-- **Formulario de empresas:** se envía con [Web3Forms](https://web3forms.com). La clave pública está en `data-access-key` del `<form data-afil-form>` en `index.html`; el correo de destino lo define Web3Forms al crear la clave. **Hoy es un correo de pruebas**: cuando el buzón `afiliaciones@optoservicenic.com` esté listo, crear otra clave con ese correo y reemplazarla en `index.html`.
-- **Horarios y direcciones:** sección `#sucursales` y pie de página en `index.html`
+- **Formulario de empresas:** está en `/empresas` (`paginas/empresas.html`) y se envía con [Web3Forms](https://web3forms.com). La clave pública está en `data-access-key` del `<form data-afil-form>` en `paginas/empresas.html`; el correo de destino lo define Web3Forms al crear la clave. **Hoy es un correo de pruebas**: cuando el buzón `afiliaciones@optoservicenic.com` esté listo, crear otra clave con ese correo y reemplazarla en `index.html`.
+- **Horarios y direcciones:** en Pages CMS (*Sucursales*, `content/sucursales.json`); el build los pone en las tarjetas, el pie, el bloque de contacto y los datos para Google
 - **Redes sociales:** Instagram `@optoservicenic`, Facebook, TikTok `@optoservice`
 - **Dominio:** `CNAME` y el dominio configurado en Settings → Pages

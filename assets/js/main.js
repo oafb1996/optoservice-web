@@ -3,7 +3,7 @@
   'use strict';
 
   var WHATSAPP = '50584024868';
-  var MOBILE = window.matchMedia('(max-width: 899.98px)');
+  var MOBILE = window.matchMedia('(max-width: 1149.98px)'); // hasta aquí se usa el menú desplegable
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var HOVER = window.matchMedia('(hover: hover) and (pointer: fine)');
 
