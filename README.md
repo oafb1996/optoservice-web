@@ -13,10 +13,12 @@ Panel: **https://app.pagescms.org** → repositorio `optoservice-web`.
   - un **recuadro de texto** (etiqueta + texto) que cambia junto con la foto, por ejemplo "Terapia visual" en la portada;
   - la **parte que siempre debe verse** (9 posiciones: arriba a la izquierda, arriba, centro, abajo a la derecha, etc.);
   - **cómo llenar el espacio**: *llenar* (recorta los bordes) o *mostrar completa* (sin recortar, con margen color lino).
+  - **fechas** *Mostrar desde* / *Mostrar hasta* para fotos de temporada (se activan y retiran solas; el sitio se regenera cada noche);
+  - un **enlace en el recuadro**: abrir "Agendar cita" (con un servicio ya elegido, si se quiere) o ir a una sección.
   Las fotos de sucursales son opcionales: si no hay, solo se ve el mapa.
-- **Vista previa de fotos**: https://optoservicenic.com/vista-previa.html muestra cada foto recortada tal como se verá en celular, tablet y computadora. Se actualiza en cada publicación, no está enlazada desde la página y Google no la indexa.
+- **Vista previa**: https://optoservicenic.com/vista-previa.html muestra arriba los **avisos** (fotos que pueden verse borrosas, sin descripción, muy recortadas, programadas o vencidas, y fotos subidas que no se usan), luego las **promociones** con su estado (vigente, vencida, oculta) y cada foto recortada tal como se verá en celular, tablet y computadora. Se actualiza en cada publicación, no está enlazada desde la página y Google no la indexa.
 
-Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir tal como salen del celular: se reducen y convierten a WebP automáticamente.
+Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir tal como salen del celular: se reducen y convierten a AVIF y WebP automáticamente. En la página, los carruseles se pueden pausar y se detienen al pasar el mouse o usar el teclado.
 
 ## Estructura
 

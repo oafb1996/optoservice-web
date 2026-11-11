@@ -56,17 +56,18 @@ content:
         label: Segundos entre fotos
         type: number
         default: 5
-        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20). Quien visita la página también puede pausarlas.
       - name: fotos
         label: "Fotos de la portada"
         type: object
         list: true
-        description: "La foto grande de arriba. Si hay más de una, rotan solas. Se ve vertical en celular y computadora, y horizontal en tablet: deja lo importante cerca del centro."
+        description: "La foto grande de arriba. Si hay más de una, rotan solas. Se ve vertical en celular y computadora, y horizontal en tablet: deja lo importante cerca del centro. Revisa cómo queda en optoservicenic.com/vista-previa.html"
         fields:
           - name: imagen
             label: Foto
             type: image
             required: true
+            description: Lo ideal es 1200 px de ancho o más. Las fotos del celular sirven tal como salen.
           - name: descripcion
             label: Descripción de la foto
             type: string
@@ -79,6 +80,28 @@ content:
             label: Texto del recuadro
             type: string
             description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enlace
+            label: Al tocar el recuadro
+            type: select
+            description: Opcional. Qué pasa cuando alguien toca el recuadro de texto. Si lo dejas vacío, el recuadro no lleva a ningún lado.
+            options:
+              values:
+                - { value: agendar, label: "Abrir «Agendar cita»" }
+                - { value: "agendar:Examen visual completo", label: "Abrir «Agendar cita» con Examen visual completo elegido" }
+                - { value: "agendar:Terapia visual", label: "Abrir «Agendar cita» con Terapia visual elegido" }
+                - { value: "agendar:Optometría pediátrica", label: "Abrir «Agendar cita» con Optometría pediátrica elegido" }
+                - { value: "agendar:Lentes oftálmicos", label: "Abrir «Agendar cita» con Lentes oftálmicos elegido" }
+                - { value: "agendar:Lentes de contacto", label: "Abrir «Agendar cita» con Lentes de contacto elegido" }
+                - { value: "agendar:Atención oftalmológica", label: "Abrir «Agendar cita» con Atención oftalmológica elegido" }
+                - { value: "#servicios", label: "Ir a la sección Servicios" }
+                - { value: "#examen", label: "Ir a la sección Examen visual" }
+                - { value: "#nosotros", label: "Ir a la sección Nosotros" }
+                - { value: "#senales", label: "Ir a la sección ¿Cuándo revisarte?" }
+                - { value: "#sucursales", label: "Ir a la sección Sucursales" }
+                - { value: "#promociones", label: "Ir a la sección Promociones" }
+                - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
+                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
             type: select
@@ -102,6 +125,14 @@ content:
               values:
                 - { value: llenar, label: Llenar el espacio (recorta los bordes) }
                 - { value: completa, label: Mostrar completa (sin recortar) }
+          - name: desde
+            label: Mostrar desde
+            type: date
+            description: Opcional. Para fotos de temporada (Navidad, regreso a clases). Antes de esta fecha la foto no se muestra.
+          - name: hasta
+            label: Mostrar hasta
+            type: date
+            description: Opcional. Al día siguiente la foto deja de mostrarse sola.
 
   - name: fotos-examen
     label: "Fotos · Examen visual"
@@ -113,17 +144,18 @@ content:
         label: Segundos entre fotos
         type: number
         default: 5
-        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20). Quien visita la página también puede pausarlas.
       - name: fotos
         label: "Fotos del examen visual"
         type: object
         list: true
-        description: "Junto a la lista del examen. Se ve horizontal en celular y tablet, y vertical en computadora."
+        description: "Junto a la lista del examen. Se ve horizontal en celular y tablet, y vertical en computadora. Revisa cómo queda en optoservicenic.com/vista-previa.html"
         fields:
           - name: imagen
             label: Foto
             type: image
             required: true
+            description: Lo ideal es 1200 px de ancho o más. Las fotos del celular sirven tal como salen.
           - name: descripcion
             label: Descripción de la foto
             type: string
@@ -136,6 +168,28 @@ content:
             label: Texto del recuadro
             type: string
             description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enlace
+            label: Al tocar el recuadro
+            type: select
+            description: Opcional. Qué pasa cuando alguien toca el recuadro de texto. Si lo dejas vacío, el recuadro no lleva a ningún lado.
+            options:
+              values:
+                - { value: agendar, label: "Abrir «Agendar cita»" }
+                - { value: "agendar:Examen visual completo", label: "Abrir «Agendar cita» con Examen visual completo elegido" }
+                - { value: "agendar:Terapia visual", label: "Abrir «Agendar cita» con Terapia visual elegido" }
+                - { value: "agendar:Optometría pediátrica", label: "Abrir «Agendar cita» con Optometría pediátrica elegido" }
+                - { value: "agendar:Lentes oftálmicos", label: "Abrir «Agendar cita» con Lentes oftálmicos elegido" }
+                - { value: "agendar:Lentes de contacto", label: "Abrir «Agendar cita» con Lentes de contacto elegido" }
+                - { value: "agendar:Atención oftalmológica", label: "Abrir «Agendar cita» con Atención oftalmológica elegido" }
+                - { value: "#servicios", label: "Ir a la sección Servicios" }
+                - { value: "#examen", label: "Ir a la sección Examen visual" }
+                - { value: "#nosotros", label: "Ir a la sección Nosotros" }
+                - { value: "#senales", label: "Ir a la sección ¿Cuándo revisarte?" }
+                - { value: "#sucursales", label: "Ir a la sección Sucursales" }
+                - { value: "#promociones", label: "Ir a la sección Promociones" }
+                - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
+                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
             type: select
@@ -159,6 +213,14 @@ content:
               values:
                 - { value: llenar, label: Llenar el espacio (recorta los bordes) }
                 - { value: completa, label: Mostrar completa (sin recortar) }
+          - name: desde
+            label: Mostrar desde
+            type: date
+            description: Opcional. Para fotos de temporada (Navidad, regreso a clases). Antes de esta fecha la foto no se muestra.
+          - name: hasta
+            label: Mostrar hasta
+            type: date
+            description: Opcional. Al día siguiente la foto deja de mostrarse sola.
 
   - name: fotos-nosotros
     label: "Fotos · Nosotros"
@@ -170,17 +232,18 @@ content:
         label: Segundos entre fotos
         type: number
         default: 5
-        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20). Quien visita la página también puede pausarlas.
       - name: fotos
         label: "Fotos de Nosotros"
         type: object
         list: true
-        description: "En la sección azul de Nuestra especialidad. Se ve vertical en celular y computadora."
+        description: "En la sección azul de Nuestra especialidad. Se ve vertical en celular y computadora. Revisa cómo queda en optoservicenic.com/vista-previa.html"
         fields:
           - name: imagen
             label: Foto
             type: image
             required: true
+            description: Lo ideal es 1200 px de ancho o más. Las fotos del celular sirven tal como salen.
           - name: descripcion
             label: Descripción de la foto
             type: string
@@ -193,6 +256,28 @@ content:
             label: Texto del recuadro
             type: string
             description: "Opcional. Una línea corta. Ej.: Ortóptica para estrabismo, ambliopía y convergencia. Si dejas etiqueta y texto vacíos, la foto va sin recuadro."
+          - name: enlace
+            label: Al tocar el recuadro
+            type: select
+            description: Opcional. Qué pasa cuando alguien toca el recuadro de texto. Si lo dejas vacío, el recuadro no lleva a ningún lado.
+            options:
+              values:
+                - { value: agendar, label: "Abrir «Agendar cita»" }
+                - { value: "agendar:Examen visual completo", label: "Abrir «Agendar cita» con Examen visual completo elegido" }
+                - { value: "agendar:Terapia visual", label: "Abrir «Agendar cita» con Terapia visual elegido" }
+                - { value: "agendar:Optometría pediátrica", label: "Abrir «Agendar cita» con Optometría pediátrica elegido" }
+                - { value: "agendar:Lentes oftálmicos", label: "Abrir «Agendar cita» con Lentes oftálmicos elegido" }
+                - { value: "agendar:Lentes de contacto", label: "Abrir «Agendar cita» con Lentes de contacto elegido" }
+                - { value: "agendar:Atención oftalmológica", label: "Abrir «Agendar cita» con Atención oftalmológica elegido" }
+                - { value: "#servicios", label: "Ir a la sección Servicios" }
+                - { value: "#examen", label: "Ir a la sección Examen visual" }
+                - { value: "#nosotros", label: "Ir a la sección Nosotros" }
+                - { value: "#senales", label: "Ir a la sección ¿Cuándo revisarte?" }
+                - { value: "#sucursales", label: "Ir a la sección Sucursales" }
+                - { value: "#promociones", label: "Ir a la sección Promociones" }
+                - { value: "#faq", label: "Ir a la sección Preguntas frecuentes" }
+                - { value: "#empresas", label: "Ir a la sección Para empresas" }
+                - { value: "#contacto", label: "Ir a la sección Contacto" }
           - name: enfoque
             label: Parte de la foto que siempre debe verse
             type: select
@@ -216,6 +301,14 @@ content:
               values:
                 - { value: llenar, label: Llenar el espacio (recorta los bordes) }
                 - { value: completa, label: Mostrar completa (sin recortar) }
+          - name: desde
+            label: Mostrar desde
+            type: date
+            description: Opcional. Para fotos de temporada (Navidad, regreso a clases). Antes de esta fecha la foto no se muestra.
+          - name: hasta
+            label: Mostrar hasta
+            type: date
+            description: Opcional. Al día siguiente la foto deja de mostrarse sola.
 
   - name: fotos-sucursales
     label: "Fotos · Sucursales"
@@ -227,7 +320,7 @@ content:
         label: Segundos entre fotos
         type: number
         default: 5
-        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20).
+        description: Cada cuánto cambia la foto si hay más de una (entre 3 y 20). Quien visita la página también puede pausarlas.
       - name: masaya
         label: "Fotos de la sucursal de Masaya"
         type: object
@@ -238,6 +331,7 @@ content:
             label: Foto
             type: image
             required: true
+            description: Lo ideal es 1200 px de ancho o más. Las fotos del celular sirven tal como salen.
           - name: descripcion
             label: Descripción de la foto
             type: string
@@ -265,6 +359,14 @@ content:
               values:
                 - { value: llenar, label: Llenar el espacio (recorta los bordes) }
                 - { value: completa, label: Mostrar completa (sin recortar) }
+          - name: desde
+            label: Mostrar desde
+            type: date
+            description: Opcional. Para fotos de temporada (Navidad, regreso a clases). Antes de esta fecha la foto no se muestra.
+          - name: hasta
+            label: Mostrar hasta
+            type: date
+            description: Opcional. Al día siguiente la foto deja de mostrarse sola.
       - name: diriomo
         label: "Fotos de la sucursal de Diriomo"
         type: object
@@ -275,6 +377,7 @@ content:
             label: Foto
             type: image
             required: true
+            description: Lo ideal es 1200 px de ancho o más. Las fotos del celular sirven tal como salen.
           - name: descripcion
             label: Descripción de la foto
             type: string
@@ -302,3 +405,11 @@ content:
               values:
                 - { value: llenar, label: Llenar el espacio (recorta los bordes) }
                 - { value: completa, label: Mostrar completa (sin recortar) }
+          - name: desde
+            label: Mostrar desde
+            type: date
+            description: Opcional. Para fotos de temporada (Navidad, regreso a clases). Antes de esta fecha la foto no se muestra.
+          - name: hasta
+            label: Mostrar hasta
+            type: date
+            description: Opcional. Al día siguiente la foto deja de mostrarse sola.

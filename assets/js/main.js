@@ -5,6 +5,7 @@
   var WHATSAPP = '50584024868';
   var MOBILE = window.matchMedia('(max-width: 899.98px)');
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HOVER = window.matchMedia('(hover: hover) and (pointer: fine)');
 
   // Menú móvil
   var burger = document.querySelector('[data-menu-toggle]');
@@ -85,6 +86,11 @@
       opener = from || null;
       sForm.reset();
       step = 1;
+      // Un enlace puede dejar elegido el servicio (por ejemplo, el recuadro de una foto)
+      var pre = from && from.getAttribute('data-servicio');
+      if (pre) {
+        sForm.querySelectorAll('input[name="servicio"]').forEach(function (r) { r.checked = r.value === pre; });
+      }
       setMenu(false);
       if (window.OptoChat && typeof window.OptoChat.close === 'function') window.OptoChat.close();
       render(false);
@@ -207,50 +213,102 @@
   }
 
   // ===== Carruseles de fotos: cambian solos mientras están a la vista =====
+  // Se detienen al pasar el mouse o al usar el teclado sobre ellos, y tienen un botón para pausarlos
+  // (pautas de accesibilidad: lo que se mueve solo más de 5 segundos se debe poder pausar).
+  var ICON_PAUSE = '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2.5" y="2" width="3" height="10"/><rect x="8.5" y="2" width="3" height="10"/></svg>';
+  var ICON_PLAY = '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3.5 2v10l8-5z"/></svg>';
   function loadSlide(slide) {
-    var img = slide.tagName === 'IMG' ? slide : slide.querySelector('img');
-    if (!img) return;
-    if (img.dataset.srcset) { img.srcset = img.dataset.srcset; delete img.dataset.srcset; }
-    if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+    slide.querySelectorAll('[data-srcset], [data-src]').forEach(function (el) {
+      if (el.dataset.srcset) { el.srcset = el.dataset.srcset; delete el.dataset.srcset; }
+      if (el.dataset.src) { el.src = el.dataset.src; delete el.dataset.src; }
+    });
   }
   document.querySelectorAll('[data-carousel]').forEach(function (box) {
     var slides = box.querySelectorAll('.slide');
     if (slides.length < 2) return;
     var current = 0, timer = null, visible = false;
+    var paused = false, hovering = false, focused = false;
     var interval = parseInt(box.getAttribute('data-interval'), 10) || 5000;
     var outside = box.getAttribute('data-dots') === 'outside';
 
-    // Indicadores: una línea por foto (debajo de la portada, sobre la foto en las demás)
-    var dots = document.createElement('div');
-    dots.className = 'carousel-dots ' + (outside ? 'is-outside' : 'is-inside');
-    dots.setAttribute('role', 'group');
-    dots.setAttribute('aria-label', 'Fotos');
+    // Controles: pausa + una línea por foto (debajo de la portada, sobre la foto en las demás)
+    var bar = document.createElement('div');
+    bar.className = 'carousel-dots ' + (outside ? 'is-outside' : 'is-inside');
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', 'Fotos');
+    var toggle = null;
+    if (!REDUCED) {
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'carousel-toggle';
+      toggle.addEventListener('click', function () {
+        paused = !paused;
+        if (!paused) { hovering = false; focused = false; } // "Reanudar" reanuda de inmediato
+        paint();
+        restart();
+      });
+      bar.appendChild(toggle);
+    }
+    var dots = [];
     slides.forEach(function (_, i) {
       var b = document.createElement('button');
       b.type = 'button';
+      b.className = 'carousel-dot';
       b.setAttribute('aria-label', 'Foto ' + (i + 1) + ' de ' + slides.length);
       if (i === 0) b.setAttribute('aria-current', 'true');
       b.addEventListener('click', function () { show(i); restart(); });
-      dots.appendChild(b);
+      dots.push(b);
+      bar.appendChild(b);
     });
-    if (outside) box.parentNode.insertBefore(dots, box.nextSibling); else box.appendChild(dots);
+    // Flechas del teclado sobre los indicadores
+    bar.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var i = (current + (e.key === 'ArrowRight' ? 1 : slides.length - 1)) % slides.length;
+      show(i);
+      dots[i].focus();
+    });
+    if (outside) box.parentNode.insertBefore(bar, box.nextSibling); else box.appendChild(bar);
 
+    function paint() {
+      if (!toggle) return;
+      toggle.innerHTML = paused ? ICON_PLAY : ICON_PAUSE;
+      toggle.setAttribute('aria-label', paused ? 'Reanudar las fotos' : 'Pausar las fotos');
+      toggle.setAttribute('aria-pressed', String(paused));
+    }
     function show(i) {
       loadSlide(slides[i]);
       slides[current].classList.remove('is-active');
-      dots.children[current].removeAttribute('aria-current');
+      dots[current].removeAttribute('aria-current');
       current = i;
       slides[current].classList.add('is-active');
-      dots.children[current].setAttribute('aria-current', 'true');
+      dots[current].setAttribute('aria-current', 'true');
       loadSlide(slides[(current + 1) % slides.length]); // precarga la siguiente
     }
     function restart() {
       clearInterval(timer);
       timer = null;
-      if (visible && !REDUCED && !document.hidden) {
+      if (visible && !REDUCED && !document.hidden && !paused && !hovering && !focused) {
         timer = setInterval(function () { show((current + 1) % slides.length); }, interval);
       }
     }
+    paint();
+
+    // Se detiene mientras el mouse o el foco del teclado están sobre la foto o sus controles
+    [box, bar].forEach(function (el) {
+      if (HOVER.matches) { // solo con mouse: en pantallas táctiles no hay "mouse fuera"
+        el.addEventListener('mouseenter', function () { hovering = true; restart(); });
+        el.addEventListener('mouseleave', function () { hovering = false; restart(); });
+      }
+      el.addEventListener('focusin', function (e) { // solo foco de teclado, no clics
+        var kb = true;
+        try { kb = e.target.matches(':focus-visible'); } catch (err) { /* navegador antiguo */ }
+        if (kb) { focused = true; restart(); }
+      });
+      el.addEventListener('focusout', function (e) {
+        if (!box.contains(e.relatedTarget) && !bar.contains(e.relatedTarget)) { focused = false; restart(); }
+      });
+    });
 
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
