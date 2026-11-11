@@ -59,6 +59,40 @@ Abrir `index.html` sin compilar también funciona: muestra la primera foto por d
 
 Para probar cómo se vería la página otro día (vencimiento de promociones): `python3 scripts/build.py --hoy 2026-12-01`.
 
+## SEO local
+
+Las dos sucursales permanecen en el inicio. Se pueden compartir enlaces directos:
+
+- Masaya: `https://optoservicenic.com/#masaya`
+- Diriomo: `https://optoservicenic.com/#diriomo`
+
+`index.html` contiene datos estructurados JSON-LD de la organización y las dos
+ópticas. Si cambian teléfono, dirección u horarios, actualizar tanto el contenido
+visible como esos datos. El domingo se describe como atención previa cita, sin
+inventar un horario fijo. No se incluyen coordenadas ni valoraciones sin verificar.
+
+El build genera `_site/sitemap.xml` a partir de la URL canónica del inicio y copia
+`robots.txt`. Los anclajes no son páginas independientes y no se agregan al sitemap.
+`vista-previa.html` queda fuera del sitemap y conserva `noindex`; se permite su
+rastreo para que los buscadores puedan leer esa directiva.
+
+Comprobar la salida real del build y sus enlaces:
+
+```bash
+python3 -m unittest discover -s scripts -p 'test_*.py'
+```
+
+Después de publicar, verificar el dominio en Google Search Console, enviar
+`https://optoservicenic.com/sitemap.xml` e inspeccionar la URL del inicio. Revisar
+también los datos estructurados en `https://validator.schema.org/`.
+Esto facilita el rastreo; no garantiza indexación ni posiciones.
+
+Pendientes fuera del código: reclamar/verificar los perfiles de Google de cada
+sucursal, confirmar sus pines, subir fotos reales y obtener sus enlaces de reseñas.
+Pueden enlazar al inicio o al anclaje de su sede. No hace falta crear páginas de
+sucursal para completar esos pasos. No se agregó analítica: requiere definir la
+medición, configurar la propiedad y revisar la política de privacidad primero.
+
 ## Asistente de chat (apagado hasta que osops esté listo)
 
 La web trae un widget de chat que habla con el canal web del asistente de osops (el chatbot de WhatsApp). Está **apagado por defecto**: mientras `content/chat.json` diga `"activo": false`, no se agrega ni una línea a la página.

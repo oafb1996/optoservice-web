@@ -23,6 +23,7 @@ import shutil
 import sys
 import unicodedata
 import urllib.parse
+import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -657,6 +658,18 @@ def main():
 
     page = version_assets(out, page)
     (out / 'index.html').write_text(page, encoding='utf-8')
+    # Solo URLs canónicas publicables: los anclajes no son páginas distintas.
+    # La vista previa queda fuera y conserva su meta noindex (no bloquearla
+    # en robots.txt: el buscador necesita leer esa directiva).
+    canonical = re.search(r'<link rel="canonical" href="([^"]+)">', page)
+    if not canonical:
+        raise ValueError('index.html debe declarar su URL canónica para el sitemap')
+    namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+    ET.register_namespace('', namespace)
+    sitemap = ET.Element(f'{{{namespace}}}urlset')
+    url = ET.SubElement(sitemap, f'{{{namespace}}}url')
+    ET.SubElement(url, f'{{{namespace}}}loc').text = html.unescape(canonical.group(1))
+    ET.ElementTree(sitemap).write(out / 'sitemap.xml', encoding='utf-8', xml_declaration=True)
     print(f'Sitio generado en {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}: '
           f'{len(optimize.cache)} imágenes optimizadas, {sum(1 for c in cards if c.startswith("<article"))} promociones vigentes'
           + (', asistente de chat ACTIVO' if chat else '')

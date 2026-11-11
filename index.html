@@ -9,9 +9,10 @@
 <link rel="canonical" href="https://optoservicenic.com/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://optoservicenic.com/">
-<meta property="og:title" content="Opto Service — Óptica y Optometría Médica">
+<meta property="og:title" content="Opto Service — Óptica en Masaya y Diriomo">
 <meta property="og:description" content="Ver bien lo cambia todo. Exámenes visuales completos y terapia visual para todas las edades en Masaya y Diriomo.">
 <meta property="og:image" content="https://optoservicenic.com/assets/img/compartir.jpg">
+<meta property="og:image:alt" content="Opto Service — Óptica y Optometría Médica en Masaya y Diriomo">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -23,6 +24,100 @@
 <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/styles.css">
 <script src="assets/js/main.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://optoservicenic.com/#organizacion",
+      "name": "Opto Service",
+      "url": "https://optoservicenic.com/",
+      "logo": "https://optoservicenic.com/assets/img/logo-opto-service.png",
+      "telephone": "+50584024868",
+      "sameAs": [
+        "https://instagram.com/optoservicenic",
+        "https://facebook.com/profile.php?id=100092434450811",
+        "https://tiktok.com/@optoservice"
+      ]
+    },
+    {
+      "@type": "Optician",
+      "@id": "https://optoservicenic.com/#masaya",
+      "name": "Opto Service — Masaya",
+      "url": "https://optoservicenic.com/#masaya",
+      "parentOrganization": {
+        "@id": "https://optoservicenic.com/#organizacion"
+      },
+      "telephone": "+50584024868",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Centro de Multiespecialidades Médicas, del cuerpo de bomberos 40m al sur.",
+        "addressLocality": "Masaya",
+        "addressCountry": "NI"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:30",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:30",
+          "closes": "15:00"
+        }
+      ],
+      "description": "Los domingos atendemos previa cita."
+    },
+    {
+      "@type": "Optician",
+      "@id": "https://optoservicenic.com/#diriomo",
+      "name": "Opto Service — Diriomo",
+      "url": "https://optoservicenic.com/#diriomo",
+      "parentOrganization": {
+        "@id": "https://optoservicenic.com/#organizacion"
+      },
+      "telephone": "+50584024868",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Plaza Candelaria, Módulo 7.",
+        "addressLocality": "Diriomo",
+        "addressCountry": "NI"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:30",
+          "closes": "17:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:00",
+          "closes": "14:00"
+        }
+      ],
+      "description": "Los domingos atendemos previa cita."
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -35,7 +130,7 @@
         <a href="#servicios">Servicios</a>
         <a href="#examen">Examen visual</a>
         <a href="#nosotros">Nosotros</a>
-        <a href="#senales">¿Cuándo revisarte?</a>
+        <a href="#sucursales">Sucursales</a>
         <a href="#faq">Preguntas frecuentes</a>
       </nav>
       <a class="btn btn-primary btn-header" href="https://wa.me/50584024868?text=%C2%A1Hola%20Opto%20Service!%20Quiero%20agendar%20un%20examen%20visual.%20%C2%BFMe%20ayudan%20con%20la%20cita%3F" target="_blank" rel="noopener" data-agendar>Agendar cita</a>
@@ -62,12 +157,12 @@
   <section id="top" class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">Óptica y Optometría Médica</div>
-        <h1>Ver bien lo cambia todo</h1>
+        <div class="eyebrow">Ver bien lo cambia todo</div>
+        <h1>Óptica y optometría en Masaya y Diriomo</h1>
         <p class="lead">Cuidamos tu salud visual en cada etapa de la vida. Exámenes completos, terapia visual especializada y atención oftalmológica — con un servicio honesto y cercano.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="https://wa.me/50584024868?text=%C2%A1Hola%20Opto%20Service!%20Quiero%20agendar%20un%20examen%20visual.%20%C2%BFMe%20ayudan%20con%20la%20cita%3F" target="_blank" rel="noopener" data-agendar>Agenda tu examen</a>
-          <a class="btn btn-outline" href="#servicios">Ver servicios</a>
+          <a class="btn btn-outline" href="#sucursales">Encuentra tu sucursal</a>
         </div>
         <div class="card hero-note">
           <div class="eyebrow">De todas las edades</div>
@@ -203,7 +298,7 @@
       <h2 class="h2">Dos sucursales para atenderte</h2>
       <p class="lead" style="max-width:520px">Visítanos en Masaya o Diriomo. Los domingos atendemos previa cita.</p>
       <div class="branches">
-        <article class="card branch">
+        <article class="card branch" id="masaya">
           <div class="branch-photo" data-carousel="masaya" data-interval="5000" hidden>
             <!--fotos:masaya-->
             <!--/fotos:masaya-->
@@ -220,7 +315,7 @@
             <a class="btn btn-outline btn-sm" href="https://www.google.com/maps/dir/?api=1&amp;destination=Opto%20Service%2C%20Cuerpo%20de%20bomberos%2040%20metros%20sur%2C%20Avenida%20central%2C%20Masaya%2C%20Nicaragua" target="_blank" rel="noopener">Cómo llegar<span class="sr-only"> a la sucursal de Masaya</span></a>
           </div>
         </article>
-        <article class="card branch">
+        <article class="card branch" id="diriomo">
           <div class="branch-photo" data-carousel="diriomo" data-interval="5000" hidden>
             <!--fotos:diriomo-->
             <!--/fotos:diriomo-->
