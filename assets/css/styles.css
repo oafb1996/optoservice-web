@@ -423,7 +423,7 @@ details[open] .faq-icon::before { content: "–"; }
 .page-title { margin-top: 14px; font: 700 clamp(38px, 6vw, 72px)/.98 var(--font); letter-spacing: -.045em; text-wrap: balance; max-width: 900px; }
 .crumbs ol { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 0 0 22px; padding: 0; list-style: none; font-size: 14px; color: var(--suave); }
 .crumbs li + li::before { content: "/"; margin: 0 8px; color: var(--raya); }
-.crumbs a { color: var(--marino); text-underline-offset: 3px; }
+.crumbs a { display: inline-block; padding: 4px 0; color: var(--marino); text-underline-offset: 3px; }
 .crumbs [aria-current] { color: var(--suave); }
 .prose { flex: 2 1 460px; min-width: 0; max-width: 720px; }
 .prose p { font-size: 17px; line-height: 1.65; color: var(--texto); }
