@@ -38,6 +38,9 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] Enlace para solicitar reseñas de Masaya en su tarjeta.
 - [ ] Completar reclamación de Diriomo y añadir su enlace de reseñas.
 - [ ] Publicar los borradores de difusión de `docs/difusion-local.md` en los canales del negocio.
+- [x] Datos de sucursales (dirección, horario, coordenadas, reseñas) en Pages CMS, como fuente única de tarjetas, pie y datos estructurados.
+- [x] Página de terapia visual (`/terapia-visual`), en borrador hasta la revisión médica (`docs/revision-medica.md`), y página 404.
+- [ ] Equipo en la sección Nosotros: listo en Pages CMS (*Equipo · Nosotros*), faltan nombres, títulos y fotos.
 - [ ] *(pendiente, se retoma después)* Elementos de confianza: quién atiende (nombre, título, foto), reseñas de pacientes, fotos reales de las sucursales.
 
 ## 🟡 Conversión y contenido
@@ -47,7 +50,8 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [ ] Más preguntas frecuentes: precio del examen, formas de pago, convenios o seguros, tiempo de entrega de los lentes.
 - [x] Variar la frase "De todas las edades": se conserva en el recuadro grande de la portada y en las preguntas frecuentes.
 - [x] Año del pie de página automático.
-- [ ] Medir visitas y clics a WhatsApp (Cloudflare Web Analytics o GoatCounter).
+- [x] Mensajes de WhatsApp con el origen ("Vengo de la página web", con la sucursal en "Agendar cita").
+- [ ] Medir visitas y clics con GA4: listo en el código; falta el ID (Pages CMS → Medición) y publicar la política de privacidad (`paginas/privacidad.html`, borrador con datos por completar y revisión legal).
 
 ## 🔧 Técnicos
 

@@ -469,7 +469,7 @@
     if (cssReady) return cssReady;
     cssReady = new Promise(function (ok) {
       var l = document.createElement('link');
-      l.rel = 'stylesheet'; l.href = 'assets/css/chat.css';
+      l.rel = 'stylesheet'; l.href = '/assets/css/chat.css';
       l.onload = l.onerror = function () { ok(); };
       document.head.appendChild(l);
       setTimeout(ok, 3000);

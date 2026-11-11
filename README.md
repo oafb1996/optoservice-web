@@ -2,7 +2,7 @@
 
 Sitio web de **Opto Service** — https://optoservicenic.com (Óptica y Optometría Médica en Masaya y Diriomo, Nicaragua).
 
-Sitio estático de una sola página (HTML + CSS + JavaScript sin dependencias), con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos y las promociones se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
+Sitio estático (HTML + CSS + JavaScript sin dependencias): la página de inicio, con las dos sucursales, más `/terapia-visual` y una página 404, con el diseño de la propuesta B, "Farmacia de lino": fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk. Las fotos, las promociones, los datos de las sucursales y el equipo se administran desde **Pages CMS**, y un paso de compilación en GitHub Actions las inserta en la página y optimiza las imágenes.
 
 ## Administrar fotos y promociones (gerencia)
 
@@ -23,17 +23,23 @@ Cada cambio guardado se publica solo en 1-2 minutos. Las fotos se pueden subir t
 ## Estructura
 
 ```
-index.html                  Página (con marcadores donde se insertan fotos y promociones)
+index.html                  Página de inicio (con marcadores donde se insertan fotos, promociones, sucursales y equipo)
+paginas/*.html              Otras páginas (terapia-visual, privacidad, 404); toman encabezado y pie de index.html
 content/fotos-*.json        Fotos de cada sección (portada, examen, nosotros, sucursales)  ← lo edita Pages CMS
 content/promociones.json    Promociones del mes              ← lo edita Pages CMS
+content/sucursales.json     Dirección, horario, coordenadas y enlace de reseñas de cada sucursal  ← Pages CMS
+content/equipo.json         Equipo de la sección Nosotros     ← lo edita Pages CMS
+content/analitica.json      ID de Google Analytics 4 (vacío = sin medición)  ← Pages CMS
+assets/js/medicion.js       Eventos de clic para GA4 (solo se carga con la medición activa)
 assets/uploads/             Fotos subidas desde el panel
 assets/css/styles.css       Estilos
 assets/js/main.js           Menú móvil, "Agendar cita" en 3 pasos, FAQ, formulario, carruseles
 assets/img/                 Logo e imagen para compartir en redes
 assets/fonts/               Fuente Schibsted Grotesk (autoalojada, licencia SIL OFL)
-scripts/build.py            Genera el sitio publicable en _site/ (y vista-previa.html)
+scripts/build.py            Genera el sitio publicable en _site/ (todas las páginas, sitemap.xml y vista-previa.html)
+scripts/test_seo.py         Pruebas del sitio generado (SEO, enlaces, borradores)
 scripts/chat-mock.py        Simulador del canal web del asistente (para desarrollo y pruebas)
-docs/                       Contrato del chat web y borrador de política de privacidad (no se publican)
+docs/                       Contrato del chat web, borrador de política de privacidad, textos de difusión y textos médicos por revisar (no se publican)
 content/chat.json           Interruptor y datos del asistente de chat       ← lo edita quien programa
 assets/js/chat.js           Panel del asistente (se descarga solo al abrirlo)
 assets/css/chat.css         Estilos del panel del asistente
@@ -61,20 +67,18 @@ Para probar cómo se vería la página otro día (vencimiento de promociones): `
 
 ## SEO local
 
-Las dos sucursales permanecen en el inicio. Se pueden compartir enlaces directos:
+Las dos sucursales permanecen en el inicio. Se pueden compartir enlaces directos (son los que van en cada Perfil de Empresa en Google):
 
 - Masaya: `https://optoservicenic.com/#masaya`
 - Diriomo: `https://optoservicenic.com/#diriomo`
 
-`index.html` contiene datos estructurados JSON-LD de la organización y las dos
-ópticas. Si cambian teléfono, dirección u horarios, actualizar tanto el contenido
-visible como esos datos. El domingo se describe como atención previa cita, sin
-inventar un horario fijo. No se incluyen coordenadas ni valoraciones sin verificar.
+**Datos de las sucursales.** Dirección, horario, coordenadas y enlace de reseñas se editan en Pages CMS (*Sucursales*, archivo `content/sucursales.json`). El build los inserta en la tarjeta de cada sucursal, en el pie y en los datos estructurados JSON-LD (organización y dos `Optician`), así lo visible y lo que lee Google no se desalinean. El domingo se describe como atención previa cita, sin inventar un horario fijo. Las coordenadas (`geo`) solo se publican si se cargan; no se incluyen valoraciones. Si hay enlace de reseñas, la tarjeta muestra "Déjanos tu reseña en Google".
 
-El build genera `_site/sitemap.xml` a partir de la URL canónica del inicio y copia
-`robots.txt`. Los anclajes no son páginas independientes y no se agregan al sitemap.
-`vista-previa.html` queda fuera del sitemap y conserva `noindex`; se permite su
-rastreo para que los buscadores puedan leer esa directiva.
+**Otras páginas.** El encabezado, el pie, los botones flotantes y la hoja de "Agendar cita" se escriben una sola vez en `index.html` (entre `<!--comun:...-->`) y el build los copia a las páginas de `paginas/`, con los enlaces ajustados (`#servicios` → `/#servicios`). GitHub Pages sirve `terapia-visual.html` como `/terapia-visual`; los enlaces y el canonical usan la versión sin `.html`. `404.html` es la página de error de GitHub Pages.
+
+**Borradores.** Una página de `paginas/` con `<meta name="borrador" content="...">` se publica con `noindex` y un aviso visible, queda fuera del sitemap y se quitan los enlaces que la apuntan (el elemento con `data-requiere="<página>"`). Para publicarla se borra esa línea. Los textos médicos pendientes de revisión están en `docs/revision-medica.md`.
+
+**Sitemap.** El build genera `_site/sitemap.xml` con la URL canónica de cada página publicable (sin `noindex`) y copia `robots.txt`. Los anclajes no son páginas independientes y no se agregan. `vista-previa.html` queda fuera del sitemap y conserva `noindex`; se permite su rastreo para que los buscadores puedan leer esa directiva.
 
 Comprobar la salida real del build y sus enlaces:
 
@@ -82,17 +86,31 @@ Comprobar la salida real del build y sus enlaces:
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-Después de publicar, verificar el dominio en Google Search Console, enviar
-`https://optoservicenic.com/sitemap.xml` e inspeccionar la URL del inicio. Revisar
-también los datos estructurados en `https://validator.schema.org/`.
-Esto facilita el rastreo; no garantiza indexación ni posiciones.
+Revisar los datos estructurados en `https://validator.schema.org/` después de publicar. Esto facilita el rastreo; no garantiza indexación ni posiciones.
 
-El botón de reseñas de Masaya ya está incorporado en su tarjeta.
-Pendientes fuera del código: completar la reclamación del perfil de Diriomo y
-obtener su enlace de reseñas; confirmar los pines, datos y fotos de ambos perfiles.
-Pueden enlazar al inicio o al anclaje de su sede. No hace falta crear páginas de
-sucursal para completar esos pasos. No se agregó analítica: requiere definir la
-medición, configurar la propiedad y revisar la política de privacidad primero.
+## Medición y origen de las consultas
+
+**Mensajes de WhatsApp.** El build agrega "Vengo de la página web." a todos los mensajes de WhatsApp de la web (botones, promociones, chat), y la hoja "Agendar cita" escribe "Vengo de la página web (Masaya)" con la sucursal elegida. Así recepción sabe qué consultas llegan por la web: es la métrica más confiable, porque un clic no es una cita.
+
+**Google Analytics 4.** Se activa solo si se cumplen las dos condiciones:
+
+1. Hay un ID en Pages CMS (*Medición (Google Analytics)*, archivo `content/analitica.json`).
+2. La política de privacidad está publicada: sin la línea `<meta name="borrador">` en `paginas/privacidad.html`. Mientras sea borrador, la medición queda apagada aunque haya ID, y el pie no enlaza la política.
+
+GA4 se carga diferido y sin señales de publicidad. `assets/js/medicion.js` envía estos eventos, sin nombres, mensajes, servicio elegido ni datos de salud:
+
+| Evento | Cuándo | Parámetros |
+|---|---|---|
+| `clic_whatsapp` | enlace a WhatsApp (intención, no consulta confirmada) | `ubicacion`, `sucursal` si se sabe |
+| `abrir_agendar` | se abre la hoja "Agendar cita" | `ubicacion` |
+| `clic_telefono` | enlace `tel:` | `ubicacion` |
+| `como_llegar` | botón "Cómo llegar" | `sucursal` |
+| `clic_resena` | botón de reseña en Google | `sucursal` |
+| `generate_lead` | formulario de empresas enviado con éxito | `metodo: empresa` |
+
+Para probar: con el ID cargado y la política publicada, abrir la web con la extensión *Google Analytics Debugger* o en GA4 → Administrar → DebugView, y tocar cada tipo de botón. En GA4 conviene registrar `ubicacion` y `sucursal` como dimensiones personalizadas (de evento) para verlas en los informes.
+
+Pendientes fuera del código: completar la reclamación del perfil de Diriomo y cargar su enlace de reseñas en Pages CMS; confirmar los pines, datos y fotos de ambos perfiles. No se agregó analítica: requiere definir la medición, configurar la propiedad y revisar la política de privacidad primero.
 
 ## Asistente de chat (apagado hasta que osops esté listo)
 

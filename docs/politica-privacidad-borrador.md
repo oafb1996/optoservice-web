@@ -85,5 +85,5 @@ Si la cambiamos, publicaremos la nueva versión en esta página con su fecha.
 ### Para quien publique esto (nota interna, borrar antes de publicar)
 
 1. Completar los [COMPLETAR] y revisar con asesoría legal.
-2. Crear la página `privacidad.html` en el sitio (puedo hacerlo con el mismo diseño de la web).
+2. ~~Crear la página en el sitio~~: ya existe como borrador en `paginas/privacidad.html` (sin la sección del chat, que está apagado; agregarla desde aquí cuando se active).
 3. Poner `"privacidadUrl": "/privacidad.html"` en `content/chat.json` y enlazar la política desde el pie de página.
