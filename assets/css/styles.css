@@ -216,7 +216,9 @@ a.photo-badge:focus-visible { outline: 2px solid var(--marino); outline-offset: 
 .service.is-highlight .num { color: var(--turquesa); }
 .service.is-highlight p { color: var(--claro); }
 .service.is-highlight p a { color: var(--turquesa); }
-.service-tag { align-self: flex-start; padding: 6px 10px; border: 1px solid var(--turquesa); border-radius: var(--pill); color: var(--turquesa); font: 600 11px/1.2 var(--font); letter-spacing: .1em; text-transform: uppercase; }
+.service-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.service h3 + p { margin-top: 6px; }
+.service-tag { padding: 6px 10px; border: 1px solid var(--turquesa); border-radius: var(--pill); color: var(--turquesa); font: 600 11px/1.2 var(--font); letter-spacing: .1em; text-transform: uppercase; }
 
 /* ===== Examen ===== */
 .exam { display: flex; flex-wrap: wrap; overflow: hidden; }
