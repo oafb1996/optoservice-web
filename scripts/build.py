@@ -681,13 +681,7 @@ def load_sucursales():
 
 def horario_dl(s):
     lines = [f'<dt>{h["etiqueta"]}</dt><dd>{h["abre"][1]} – {h["cierra"][1]}</dd>' for h in s['horario']]
-    return lines + ['<dt>Domingo</dt><dd>Previa cita</dd>']
-
-
-def horario_texto(s):
-    partes = [f'{h["etiqueta"].lower() if i else h["etiqueta"]}, de {h["abre"][1]} a {h["cierra"][1]}'
-              for i, h in enumerate(s['horario'])]
-    return '; '.join(partes) + '. Los domingos atendemos previa cita.'
+    return lines
 
 
 def optician(s):
@@ -750,7 +744,7 @@ def render_contact_hours(sucs):
         else:
             texto = '<br>'.join(f'<span class="nowrap">{sucs[sid]["nombre"]}: {r}</span>' for sid, r in rangos.items())
         lines.append(f'  <dt>{etiqueta}</dt><dd>{texto}</dd>')
-    return lines + ['  <dt>Domingo</dt><dd>Previa cita</dd>', '</dl>']
+    return lines + ['</dl>']
 
 
 def render_footer_branches(sucs):
