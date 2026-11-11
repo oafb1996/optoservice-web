@@ -40,17 +40,15 @@ MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
 
 # Espacios de foto: ancho mostrado (atributo sizes), encuadre y texto alternativo por defecto
 SLOTS = {
-    'portada': {'sizes': '(max-width: 879px) calc(100vw - 36px), 470px', 'pos': '50% 28%',
+    'portada': {'sizes': '(max-width: 899px) calc(100vw - 32px), 590px', 'pos': '50% 30%',
                 'alt': 'Paciente con lentes en Opto Service'},
-    'servicios': {'sizes': '(max-width: 879px) calc(100vw - 44px), 380px', 'pos': '50% 45%',
-                  'alt': 'Lentes disponibles en Opto Service'},
-    'examen': {'sizes': '(max-width: 879px) calc(100vw - 44px), 440px', 'pos': '50% 32%',
-               'alt': 'Paciente de Opto Service con sus lentes'},
-    'nosotros': {'sizes': '(max-width: 879px) calc(100vw - 44px), 460px', 'pos': '50% 30%',
+    'examen': {'sizes': '(max-width: 899px) calc(100vw - 34px), 510px', 'pos': '50% 55%',
+               'alt': 'Lentes disponibles en Opto Service'},
+    'nosotros': {'sizes': '(max-width: 899px) calc(100vw - 32px), 480px', 'pos': '50% 30%',
                  'alt': 'Paciente de Opto Service'},
 }
 ENFOQUE = {'arriba': '50% 22%', 'centro': '50% 50%', 'abajo': '50% 80%'}
-PROMO_SIZES = '(max-width: 879px) 82vw, 360px'
+PROMO_SIZES = '(max-width: 599px) calc(100vw - 32px), 300px'
 WA_GENERAL = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quiero agendar un examen visual. ¿Me ayudan con la cita?', safe='')
 WA_CHAT = f'https://wa.me/{WHATSAPP}?text=' + urllib.parse.quote('¡Hola Opto Service! Quisiera hablar con una persona del equipo.', safe='')
 CHAT_ICON = ('<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" '
@@ -214,7 +212,7 @@ def render_promos(items, optimize, today):
         if vence:
             card.append(f'    <div class="promo-date">Válida hasta el {vence.day} de {MESES[vence.month - 1]}</div>')
         label = f' aria-label="Quiero esta promoción: {attr(titulo)}"' if titulo else ''
-        card.append(f'    <a class="promo-cta" href="{attr(wa)}" target="_blank" rel="noopener"{label}>Quiero esta promoción →</a>')
+        card.append(f'    <a class="promo-cta" href="{attr(wa)}" target="_blank" rel="noopener"{label}>Quiero esta promoción</a>')
         card.append('  </div>')
         card.append('</article>')
         cards.extend(card)

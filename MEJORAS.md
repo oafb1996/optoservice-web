@@ -5,7 +5,9 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 ## Nuevas funciones
 
 - [x] **Promociones del mes**: sección propia, administrable desde Pages CMS, con fecha de vencimiento (se ocultan solas) y botón de WhatsApp por promoción.
-- [x] **Carruseles de fotos** en portada, servicios, examen y nosotros, administrables desde Pages CMS.
+- [x] **Carruseles de fotos** en portada, examen y nosotros, administrables desde Pages CMS.
+- [x] **Nuevo diseño (propuesta B, "Farmacia de lino")**: fondo lino, azul marino y turquesa, tipografía Schibsted Grotesk.
+- [x] **Agendar cita en 3 pasos** (servicio, sucursal, cuándo): arma el mensaje de WhatsApp.
 - [x] **Optimización automática de imágenes** subidas desde el panel (WebP en varios tamaños), para que las fotos del celular no hagan lenta la web.
 - [x] Pages CMS conectado: administración y gerencia suben fotos y promociones desde el panel.
 - [ ] **Asistente de chat en la web** (chatbot de osops): widget listo y apagado; falta el backend. Ver la sección del final.
@@ -45,13 +47,13 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 - [x] Etiqueta `<main>` y tamaño declarado de las imágenes.
 - [x] Logo liviano (antes 1543 px para mostrarse a 82 px).
 - [x] Imagen para compartir en WhatsApp/Facebook en formato 1200×630.
-- [ ] Contraste del borde de los campos del formulario de empresas (1,3:1; las pautas de accesibilidad piden 3:1). En el chat ya está corregido.
+- [x] Contraste del borde de los campos del formulario de empresas (ahora 3,3:1; antes 1,3:1).
 
 ## 💬 Asistente de chat en la web (chatbot de osops)
 
 Contrato con osops en `docs/contrato-chat-web.md`. El widget está listo y **apagado** hasta que el backend exista.
 
-- [x] Widget de la web: burbuja en escritorio, botón "Asistente" en la barra del móvil, panel accesible, carga diferida (no cuesta velocidad), Turnstile, manejo de errores y traspaso a WhatsApp.
+- [x] Widget de la web: botón "Asistente" en escritorio, botón "Asistente" en la barra del móvil, panel accesible, carga diferida (no cuesta velocidad), Turnstile, manejo de errores y traspaso a WhatsApp.
 - [x] Probado con un simulador del contrato (`scripts/chat-mock.py`) en escritorio y en móviles de 320 a 430 px, y con axe (accesibilidad) con el panel abierto.
 - [ ] Backend en osops: rutas `/session` y `/message`, tablas, límites, CORS, Turnstile y tope de gasto (estimado 3-4 días).
 - [ ] Cuenta de Cloudflare y widget de Turnstile (la clave secreta va en Render; a la web solo llega la *site key*).
