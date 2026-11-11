@@ -22,6 +22,83 @@
 <link rel="apple-touch-icon" href="assets/img/icons/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/styles.css">
+<!-- Datos estructurados (Google). Horarios, dirección y teléfono deben coincidir con #sucursales.
+     TODO: agregar "geo" (latitude/longitude) de cada sucursal con el pin exacto del Perfil de Empresa en Google;
+     los mapas embebidos buscan por dirección y no traen coordenadas.
+     TODO: al publicar /masaya y /diriomo (fase 2), cambiar cada "url" a la página de su sucursal. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://optoservicenic.com/#organization",
+      "name": "Opto Service",
+      "description": "Óptica y optometría médica en Masaya y Diriomo, Nicaragua.",
+      "url": "https://optoservicenic.com/",
+      "logo": "https://optoservicenic.com/assets/img/logo-opto-service.png",
+      "telephone": "+505 8402 4868",
+      "sameAs": [
+        "https://instagram.com/optoservicenic",
+        "https://facebook.com/profile.php?id=100092434450811",
+        "https://tiktok.com/@optoservice"
+      ]
+    },
+    {
+      "@type": "Optician",
+      "@id": "https://optoservicenic.com/masaya#optician",
+      "name": "Opto Service Masaya",
+      "description": "Óptica y optometría médica en Masaya: examen visual completo, terapia visual, optometría pediátrica, lentes oftálmicos y de contacto. Domingos previa cita.",
+      "url": "https://optoservicenic.com/#sucursales",
+      "image": "https://optoservicenic.com/assets/img/compartir.jpg",
+      "telephone": "+505 8402 4868",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Centro de Multiespecialidades Médicas, del cuerpo de bomberos 40 m al sur",
+        "addressLocality": "Masaya",
+        "addressRegion": "Masaya",
+        "addressCountry": "NI"
+      },
+      "openingHoursSpecification": [
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:30", "closes": "17:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:30", "closes": "15:00"}
+      ],
+      "parentOrganization": {"@id": "https://optoservicenic.com/#organization"},
+      "sameAs": [
+        "https://instagram.com/optoservicenic",
+        "https://facebook.com/profile.php?id=100092434450811",
+        "https://tiktok.com/@optoservice"
+      ]
+    },
+    {
+      "@type": "Optician",
+      "@id": "https://optoservicenic.com/diriomo#optician",
+      "name": "Opto Service Diriomo",
+      "description": "Óptica y optometría médica en Diriomo, Granada: examen visual completo, terapia visual, optometría pediátrica, lentes oftálmicos y de contacto. Domingos previa cita.",
+      "url": "https://optoservicenic.com/#sucursales",
+      "image": "https://optoservicenic.com/assets/img/compartir.jpg",
+      "telephone": "+505 8402 4868",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Plaza Candelaria, Módulo 7",
+        "addressLocality": "Diriomo",
+        "addressRegion": "Granada",
+        "addressCountry": "NI"
+      },
+      "openingHoursSpecification": [
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:30", "closes": "17:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "14:00"}
+      ],
+      "parentOrganization": {"@id": "https://optoservicenic.com/#organization"},
+      "sameAs": [
+        "https://instagram.com/optoservicenic",
+        "https://facebook.com/profile.php?id=100092434450811",
+        "https://tiktok.com/@optoservice"
+      ]
+    }
+  ]
+}
+</script>
 <script src="assets/js/main.js" defer></script>
 </head>
 <body>
@@ -350,7 +427,7 @@
   <footer class="site-footer">
     <div class="wrap footer-grid">
       <div class="footer-brand">
-        <img src="assets/img/logo-opto-service.png" alt="Opto Service — Óptica y Optometría Médica" width="112" height="52">
+        <img src="assets/img/logo-opto-service.png" alt="Opto Service — Óptica y Optometría Médica" width="112" height="52" loading="lazy" decoding="async">
         <p>Óptica y Optometría Médica. Un servicio honesto y cercano para cuidar la visión de toda tu familia.</p>
       </div>
       <nav class="footer-nav" aria-label="Pie de página">

@@ -10,6 +10,7 @@
    recortadas o sin usar), las promociones con su estado y cada foto recortada
    como se verá en celular, tablet y computadora (no se enlaza desde la página
    ni la indexa Google).
+5. Genera sitemap.xml con las páginas de SITEMAP.
 
 Uso:  python3 scripts/build.py [--out _site]
 """
@@ -20,6 +21,7 @@ import json
 import math
 import re
 import shutil
+import subprocess
 import sys
 import unicodedata
 import urllib.parse
@@ -39,6 +41,8 @@ EXCLUDE = {'.git', '.github', '.gitignore', '.pages.yml', 'scripts', 'content', 
 WIDTHS = (480, 800, 1200)
 WHATSAPP = '50584024868'
 NICARAGUA = timezone(timedelta(hours=-6))
+DOMINIO = 'https://optoservicenic.com'  # el mismo de CNAME, canonical y datos estructurados
+SITEMAP = ['/']  # páginas públicas (agregar aquí cada página nueva)
 MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
          'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
@@ -599,6 +603,21 @@ def version_assets(out, page):
     return page.replace('<meta name="theme-color"', f'<meta name="build" content="{build_id}">\n<meta name="theme-color"', 1)
 
 
+def last_commit_date(today):
+    """Fecha del último commit (la del cambio publicado). No cambia con la compilación de cada noche."""
+    try:
+        out = subprocess.run(['git', 'log', '-1', '--format=%cs'], cwd=ROOT, capture_output=True, text=True, check=True)
+        return date.fromisoformat(out.stdout.strip()).isoformat()
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        return today.isoformat()
+
+
+def render_sitemap(lastmod):
+    urls = ''.join(f'  <url><loc>{DOMINIO}{path}</loc><lastmod>{lastmod}</lastmod></url>\n' for path in SITEMAP)
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--out', default='_site', help='carpeta de salida (por defecto _site)')
@@ -654,6 +673,8 @@ def main():
     notices = collect_notices(fotos, promos_raw, optimize, today)
     (out / 'vista-previa.html').write_text(
         render_preview(fotos, promo_states(promos_raw, optimize, today), notices, today), encoding='utf-8')
+
+    (out / 'sitemap.xml').write_text(render_sitemap(last_commit_date(today)), encoding='utf-8')
 
     page = version_assets(out, page)
     (out / 'index.html').write_text(page, encoding='utf-8')

@@ -30,8 +30,8 @@ Surge de la revisión integral del sitio (octubre 2026). Se marca cada punto al 
 > Los puntos de Google quedan **pospuestos hasta que la página esté completamente lista**.
 
 - [x] Contraste de colores: etiquetas turquesa sobre fondos claros, botones de WhatsApp y textos pequeños.
-- [ ] *(pospuesto)* Datos estructurados de "Óptica" (LocalBusiness) para las dos sucursales.
-- [ ] *(pospuesto)* `sitemap.xml` y `robots.txt`.
+- [x] Datos estructurados de "Óptica" (Optician) para las dos sucursales. *Falta: coordenadas (geo) desde Google Business.*
+- [x] `sitemap.xml` (lo genera `scripts/build.py`) y `robots.txt`.
 - [ ] *(pospuesto)* Alta en Google Search Console.
 - [ ] *(pospuesto)* Enlazar la web desde el perfil de Google Business.
 - [ ] *(pospuesto)* Mapas con el pin exacto de cada sucursal (desde Google Business).
